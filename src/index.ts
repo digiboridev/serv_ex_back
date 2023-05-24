@@ -1,7 +1,6 @@
 import { connect } from "mongoose";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { fillUsers } from "./datamock";
 import { authRoutes } from "./auth.routes";
 
 const fastify = Fastify({ logger: true });
@@ -25,5 +24,4 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
         process.exit(1);
     }
 
-    // await fillUsers();
 })();
