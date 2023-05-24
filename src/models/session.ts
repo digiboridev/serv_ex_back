@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-export interface Session {
+export type Session = {
     id: string;
     user: string;
     createdAt: Date;
@@ -13,24 +13,7 @@ const SessionSchema = new Schema(
     },
     {
         timestamps: true,
-        virtuals: {
-            id: {
-                get: function (this: any): string {
-                    return this._id;
-                },
-            },
-            createdAt: {
-                get: function (this: any): Date {
-                    return this.createdAt;
-                },
-            },
-            updatedAt: {
-                get: function (this: any): Date {
-                    return this.updatedAt;
-                },
-            },
-        },
     }
 );
 
-export const SessionModel = model("Session", SessionSchema);
+export const SessionModel = model<Session>("Session", SessionSchema);

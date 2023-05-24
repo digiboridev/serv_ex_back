@@ -31,24 +31,7 @@ const UserSchema = new Schema(
     },
     {
         timestamps: true,
-        virtuals: {
-            id: {
-                get: function (this: any): string {
-                    return this._id;
-                },
-            },
-            createdAt: {
-                get: function (this: any): Date {
-                    return this.createdAt;
-                },
-            },
-            updatedAt: {
-                get: function (this: any): Date {
-                    return this.updatedAt;
-                },
-            },
-        },
     }
 );
 
-export const UserModel = model("User", UserSchema);
+export const UserModel = model<User>("User", UserSchema);

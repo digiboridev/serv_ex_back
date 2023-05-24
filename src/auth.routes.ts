@@ -1,26 +1,12 @@
 import { FastifyInstance } from "fastify";
-import { UserService } from "./services/user.service";
-import { User, UserCredentials } from "./models/user";
-import { Jwt, sign } from "jsonwebtoken";
-import { verify } from "jsonwebtoken";
-import { SessionModel } from "./models/session";
-import { SessionService } from "./services/session.service";
+import { AuthController } from "./controllers/auth.controller";
+import { getErrorMessage } from "./utils/get_error_message";
+import { Credentials } from "./dto/credentials";
+import { credentialsSchema } from "./schemas/credentials";
 
-const credentialsSchema = {
-    type: "object",
-    properties: {
-        email: { type: "string", minLength: 3, maxLength: 20 },
-        phone: { type: "string", minLength: 3, maxLength: 20 },
-        password: { type: "string", minLength: 3, maxLength: 20 },
-    },
-    oneOf: [{ required: ["email"] }, { required: ["phone"] }],
-    required: ["password"],
-};
-
-export type Credentials = {
-    email?: string;
-    phone?: string;
-    password: string;
+const midd1 = async (request: any, reply: any) => {
+    console.log("midd1");
+    reply.status(400).send({ error: "prost" });
 };
 
 export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
@@ -32,29 +18,36 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
             },
         },
         async (request, reply) => {
-            const { email, phone, password } = request.body;
-            console.log("password-signin: ", email, phone, password);
-
-            let user: UserCredentials | null = null;
-            if (email) user = await UserService.getUserCredentialsByEmail(email);
-            if (phone) user = await UserService.getUserCredentialsByPhone(phone);
-
-            if (!user) {
-                reply.status(400).send({ error: "No user found" });
-                console.log("No user found");
-                return;
+            try {
+                const result = await AuthController.passwordLogin(request.body);
+                reply.send(result);
+            } catch (error) {
+                reply.status(400).send({ error: getErrorMessage(error) });
             }
+        }
+    );
 
-            if (user.password !== password) {
-                reply.status(400).send({ error: "Wrong password" });
-                console.log("Wrong password");
-                return;
+    fastify.post<{ Body: { refreshToken: string } }>(
+        "/refresh-token",
+        {
+            schema: {
+                body: {
+                    type: "object",
+                    properties: {
+                        refreshToken: { type: "string" },
+                    },
+
+                    required: ["refreshToken"],
+                },
+            },
+        },
+        async (request, reply) => {
+            try {
+                const result = await AuthController.refreshToken(request.body.refreshToken);
+                reply.send(result);
+            } catch (error) {
+                reply.status(401).send({ error: getErrorMessage(error) });
             }
-
-            const session = await SessionService.createSession(user.id);
-            const refreshToken = sign({ sessionId: session.id }, "refresh_token_secret", { expiresIn: "1y" });
-            const accessToken = sign({ userId: user.id }, "access_token_secret", { expiresIn: "15m" });
-            reply.send({ refreshToken, accessToken });
         }
     );
 
