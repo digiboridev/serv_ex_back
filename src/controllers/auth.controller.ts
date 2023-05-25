@@ -1,6 +1,6 @@
 import { sign, verify } from "jsonwebtoken";
 import { UserService } from "../services/user.service";
-import { UserCredentials, UserData } from "../models/user";
+import { UserCredentials } from "../models/user";
 import { SessionService } from "../services/session.service";
 import { Credentials } from "../dto/credentials";
 
@@ -43,5 +43,11 @@ export class AuthController {
 
     static signRefreshToken(sessionId: string): string {
         return sign({ sessionId: sessionId }, "refresh_token_secret", { expiresIn: "1y" });
+    }
+
+    static verifyAccessToken(token: string): string {
+        const payload = verify(token, "access_token_secret");
+        if (typeof payload !== "object" || !("userId" in payload)) throw new Error("Invalid payload");
+        return payload.userId;
     }
 }

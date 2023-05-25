@@ -31,7 +31,33 @@ const UserSchema = new Schema(
     },
     {
         timestamps: true,
+        virtuals: {
+            toUserData: {
+                get: function (this: any): UserData {
+                    return {
+                        id: this.id,
+                        name: this.name,
+                        phone: this.phone,
+                        email: this.email,
+                        phoneVerified: this.phoneVerified,
+                        emailVerified: this.emailVerified,
+                        createdAt: this.createdAt,
+                        updatedAt: this.updatedAt,
+                    };
+                },
+            },
+            toCredentials: {
+                get: function (this: any): UserCredentials {
+                    return {
+                        id: this.id,
+                        phone: this.phone,
+                        email: this.email,
+                        password: this.password,
+                    };
+                },
+            },
+        },
     }
 );
 
-export const UserModel = model<User>("User", UserSchema);
+export const UserModel = model("User", UserSchema);

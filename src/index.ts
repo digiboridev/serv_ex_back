@@ -1,11 +1,14 @@
 import { connect } from "mongoose";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import { authRoutes } from "./auth.routes";
+import { authRoutes } from "./routes/auth.routes";
+import { userRoutes } from "./routes/user.routes";
 
 const fastify = Fastify({ logger: true });
 fastify.register(cors, {});
 fastify.register(authRoutes, { prefix: "/auth" });
+fastify.register(userRoutes, { prefix: "/user" });
+
 fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
 
 (async function start() {
