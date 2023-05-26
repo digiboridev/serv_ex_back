@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { AuthController } from "../controllers/auth.controller";
-import { getErrorMessage } from "../utils/get_error_message";
+import { errorMessage } from "../utils/errors";
 
 declare module "fastify" {
     interface FastifyRequest {
@@ -9,19 +9,20 @@ declare module "fastify" {
 }
 
 export const authMiddleware = async (request: FastifyRequest, reply: FastifyReply) => {
-    console.log("authMiddleware");
-
     const token = request.headers.authorization?.split(" ")[1];
     if (!token) {
         reply.status(401).send({ error: "No token provided" });
+        console.log("auth middleware:", "no token provided");
         return;
     }
 
     try {
         const userId = AuthController.verifyAccessToken(token);
         request.userId = userId;
+        console.log("auth middleware:", "token verified", userId);
     } catch (error) {
-        reply.status(401).send({ error: getErrorMessage(error) });
+        reply.status(401).send({ error: errorMessage(error) });
+        console.log("auth middleware:", error);
         return;
     }
 };

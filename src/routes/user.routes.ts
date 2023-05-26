@@ -1,6 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { getErrorMessage } from "../utils/get_error_message";
-import { AuthController } from "../controllers/auth.controller";
+import { ApiError, errorMessage } from "../utils/errors";
 import { UserService } from "../services/user.service";
 import { authMiddleware } from "../middlewares/auth.middleware";
 
@@ -13,7 +12,11 @@ export const userRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
             const result = await UserService.getUserDataById(request.userId);
             reply.send(result);
         } catch (error) {
-            reply.status(500).send({ error: getErrorMessage(error) });
+            if (error instanceof ApiError) {
+                reply.status(error.code).send({ error: error.message });
+            } else {
+                reply.status(500).send({ error: errorMessage(error) });
+            }
         }
     });
 

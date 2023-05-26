@@ -2,7 +2,8 @@ import { Schema, model } from "mongoose";
 
 export type UserData = {
     id: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     phone: string;
     email: string;
     phoneVerified: boolean;
@@ -22,7 +23,8 @@ export type User = UserData & UserCredentials;
 
 const UserSchema = new Schema(
     {
-        name: { type: String, required: true },
+        firstName: { type: String, required: true },
+        lastName: { type: String, required: true },
         phone: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true, select: false },
@@ -36,7 +38,8 @@ const UserSchema = new Schema(
                 get: function (this: any): UserData {
                     return {
                         id: this.id,
-                        name: this.name,
+                        firstName: this.firstName,
+                        lastName: this.lastName,
                         phone: this.phone,
                         email: this.email,
                         phoneVerified: this.phoneVerified,
