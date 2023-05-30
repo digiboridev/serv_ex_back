@@ -69,10 +69,7 @@ export const userRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
                 response: {
                     200: {
                         type: "array",
-                        items: {
-                            type: "object",
-                            properties: userContactSchema,
-                        },
+                        items: userContactSchema,
                     },
                 },
             },
