@@ -1,5 +1,5 @@
 {
-  "name": "testback",
+  "name": "serve_expert_backend",
   "scripts": {
     "build": "npm i && tsc",
     "build:watch": "tsc --watch",
