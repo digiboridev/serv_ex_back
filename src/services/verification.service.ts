@@ -2,13 +2,17 @@ import { VerificationCodeModel } from "../models/verification_code";
 
 export class VerificationService {
     static async createPhoneVerification(phoneNumber: string): Promise<{ code: string; token: string }> {
-        const fourDigitCode = Math.floor(1000 + Math.random() * 9000).toString();
+        // const fourDigitCode = Math.floor(1000 + Math.random() * 9000).toString();
+        // TODO send real code
+        const fourDigitCode = "1234";
         const code = await VerificationCodeModel.create({ credential: phoneNumber, credentialType: "phone", code: fourDigitCode });
         return { code: fourDigitCode, token: code.id };
     }
 
     static async createEmailVerification(email: string): Promise<{ code: string; token: string }> {
-        const fourDigitCode = Math.floor(1000 + Math.random() * 9000).toString();
+        // const fourDigitCode = Math.floor(1000 + Math.random() * 9000).toString();
+        // TODO send real code
+        const fourDigitCode = "1234";
         const code = await VerificationCodeModel.create({ credential: email, credentialType: "email", code: fourDigitCode });
         return { code: fourDigitCode, token: code.id };
     }

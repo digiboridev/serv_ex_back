@@ -8,6 +8,7 @@ import { UserModel } from "./models/user";
 import { CompanyService } from "./services/company.service";
 import { fillUsers } from "./datamock";
 import { VerificationCodeModel } from "./models/verification_code";
+import { companyRoutes } from "./routes/company.routes";
 
 
 const fastify = Fastify({ logger: true });
@@ -15,6 +16,8 @@ const fastify = Fastify({ logger: true });
 fastify.register(cors, {});
 fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(userRoutes, { prefix: "/user" });
+fastify.register(companyRoutes, { prefix: "/company" });
+
 fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
 
 (async function start() {

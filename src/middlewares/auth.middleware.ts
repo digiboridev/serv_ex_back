@@ -11,7 +11,7 @@ declare module "fastify" {
 export const authMiddleware = async (request: FastifyRequest, reply: FastifyReply) => {
     const token = request.headers.authorization?.split(" ")[1];
     if (!token) {
-        reply.status(401).send({ error: "No token provided" });
+        reply.status(401).send("No token provided");
         console.log("auth middleware:", "no token provided");
         return;
     }
@@ -21,7 +21,7 @@ export const authMiddleware = async (request: FastifyRequest, reply: FastifyRepl
         request.userId = userId;
         console.log("auth middleware:", "token verified", userId);
     } catch (error) {
-        reply.status(401).send({ error: errorMessage(error) });
+        reply.status(401).send(errorMessage(error));
         console.log("auth middleware:", error);
         return;
     }

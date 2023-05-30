@@ -1,38 +1,59 @@
-import { UserCredentials, UserData, UserModel } from "../models/user";
+import { User, UserModel } from "../models/user";
+import { UserContact, UserContactModel } from "../models/user_contacts";
 
 export class UserService {
-    static async getUserDataById(id: string): Promise<UserData | null> {
+    static async getUserById(id: string): Promise<User | null> {
         const user = await UserModel.findById(id);
-        if (user) return user.toUserData;
+        if (user) return user.toEntity;
         return null;
     }
 
-    static async getUserDataByPhone(phone: string): Promise<UserData | null> {
+    static async getUserByPhone(phone: string): Promise<User | null> {
         const user = await UserModel.findOne({ phone: phone });
-        if (user) return user.toUserData;
+        if (user) return user.toEntity;
         return null;
     }
 
-    static async getUserDataByEmail(email: string): Promise<UserData | null> {
+    static async getUserByEmail(email: string): Promise<User | null> {
         const user = await UserModel.findOne({ email: email });
-        if (user) return user.toUserData;
+        if (user) return user.toEntity;
         return null;
     }
 
-    static async getUserCredentialsByPhone(phone: string): Promise<UserCredentials | null> {
-        const user = await UserModel.findOne({ phone: phone }).select("password phone email");
-        if (user) return user.toCredentials;
+    static async findUserByPhoneOrEmail(phoneOrEmail: string): Promise<User | null> {
+        const user = await UserModel.findOne({ $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }] });
+        if (user) return user.toEntity;
         return null;
     }
 
-    static async getUserCredentialsByEmail(email: string): Promise<UserCredentials | null> {
-        const user = await UserModel.findOne({ email: email }).select("password phone email");
-        if (user) return user.toCredentials;
-        return null;
+    static async createUser(firstName: string, lastName: string, phone: string, email: string, phoneVerified: boolean, emailVerified: boolean): Promise<User> {
+        const user = await UserModel.create({
+            firstName: firstName,
+            lastName: lastName,
+            phone: phone,
+            email: email,
+            phoneVerified: phoneVerified,
+            emailVerified: emailVerified,
+        });
+        return user.toEntity;
     }
 
-    static async createUser(name: string, phone: string, email: string, password: string): Promise<UserData> {
-        const user = await UserModel.create({ name: name, phone: phone, email: email, password: password });
-        return user.toUserData;
+    static async userContacts(userId: string): Promise<UserContact[]> {
+        const contacts = await UserContactModel.find({ userId });
+        return contacts.map((contact) => contact.toEntity);
+    }
+
+    static async updateUserContacts(userId: string, contacts: { firstName: string; lastName: string; phone: string }[]): Promise<UserContact[]> {
+        const userContacts = contacts.map((contact) => {
+            return {
+                userId,
+                firstName: contact.firstName,
+                lastName: contact.lastName,
+                phone: contact.phone,
+            };
+        });
+        await UserContactModel.deleteMany({ userId });
+        const newContacts = await UserContactModel.insertMany(userContacts);
+        return newContacts.map((contact) => contact.toEntity);
     }
 }

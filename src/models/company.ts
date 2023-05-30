@@ -20,7 +20,7 @@ const CompanySchema = new Schema(
     {
         timestamps: true,
         virtuals: {
-            toCompany: {
+            toEntity: {
                 get: function (this: any): Company {
                     return {
                         id: this.id,
