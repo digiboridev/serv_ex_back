@@ -5,7 +5,7 @@ export type Company = {
     name: string;
     email: string;
     publicId: string;
-    members: string[];
+    membersIds: string[];
     createdAt: Date;
     updatedAt: Date;
 };
@@ -27,7 +27,7 @@ const CompanySchema = new Schema(
                         name: this.name,
                         email: this.email,
                         publicId: this.publicId,
-                        members: this.members,
+                        membersIds: this.members,
                         createdAt: this.createdAt,
                         updatedAt: this.updatedAt,
                     };

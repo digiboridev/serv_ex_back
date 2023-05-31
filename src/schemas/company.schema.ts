@@ -5,7 +5,7 @@ export const companySchema = {
         name: { type: "string" },
         email: { type: "string" },
         publicId: { type: "string" },
-        members: { type: "array", items: { type: "string" } },
+        membersIds: { type: "array", items: { type: "string" } },
         createdAt: { type: "string" },
         updatedAt: { type: "string" },
     },

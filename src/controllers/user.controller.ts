@@ -3,7 +3,7 @@ import { UserContact } from "../models/user_contacts";
 import { UserService } from "../services/user.service";
 
 export class UserController {
-    static async getUserById(userId: string): Promise<User | null> {
+    static async me(userId: string): Promise<User | null> {
         return UserService.getUserById(userId);
     }
 
@@ -15,7 +15,4 @@ export class UserController {
         return UserService.updateUserContacts(userId, contacts);
     }
 
-    static async findUserByPhoneOrEmail(phoneOrEmail: string): Promise<User | null> {
-        return UserService.findUserByPhoneOrEmail(phoneOrEmail);
-    }
 }

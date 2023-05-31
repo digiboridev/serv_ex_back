@@ -9,7 +9,7 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
     fastify.addHook("preHandler", authMiddleware);
 
     fastify.get(
-        "/companies",
+        "/user-companies",
         {
             schema: {
                 response: {
@@ -58,16 +58,16 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
         }
     );
 
-    fastify.post<{ Body: { companyId: string; members: string[] } }>(
+    fastify.post<{ Body: { companyId: string; membersIds: string[] } }>(
         "/update-members",
         {
             schema: {
                 body: {
                     type: "object",
-                    required: ["companyId", "members"],
+                    required: ["companyId", "membersIds"],
                     properties: {
                         companyId: { type: "string" },
-                        members: { type: "array", items: { type: "string" } },
+                        membersIds: { type: "array", items: { type: "string" } },
                     },
                 },
                 response: {
@@ -77,7 +77,7 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
         },
         async (request, reply) => {
             try {
-                const result = await CompanyController.updateMembers(request.body.companyId, request.body.members, request.userId);
+                const result = await CompanyController.updateMembers(request.body.companyId, request.body.membersIds, request.userId);
                 reply.send(result);
             } catch (error) {
                 if (error instanceof ApiError) {

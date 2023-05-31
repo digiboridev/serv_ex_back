@@ -19,7 +19,7 @@ export const userRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
         },
         async (request, reply) => {
             try {
-                const result = await UserController.getUserById(request.userId);
+                const result = await UserController.me(request.userId);
                 if (!result) throw new ApiError("User not found", 404);
                 reply.send(result);
             } catch (error) {
@@ -77,32 +77,6 @@ export const userRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
         async (request, reply) => {
             try {
                 const result = await UserController.updateUserContacts(request.userId, request.body);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
-        }
-    );
-
-    fastify.get<{ Querystring: { phoneOrEmail: string } }>(
-        "/findByPhoneOrEmail",
-        {
-            schema: {
-                querystring: {
-                    phoneOrEmail: { type: "string" },
-                },
-                response: {
-                    200: userSchema,
-                },
-            },
-        },
-        async (request, reply) => {
-            try {
-                const result = await UserController.findUserByPhoneOrEmail(request.query.phoneOrEmail);
                 reply.send(result);
             } catch (error) {
                 if (error instanceof ApiError) {
