@@ -11,4 +11,8 @@ export class UsersController {
         return UserService.findUserByPhoneOrEmail(phoneOrEmail);
     }
 
+    static async searchUsers(query: string): Promise<User[]> {
+        return UserService.searchUsers(query);
+    }
+    
 }

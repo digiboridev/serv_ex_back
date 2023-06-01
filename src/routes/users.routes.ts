@@ -1,4 +1,4 @@
-import { FastifyInstance} from "fastify";
+import { FastifyInstance } from "fastify";
 import { ApiError, errorMessage } from "../utils/errors";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { userSchema } from "../schemas/user.schema";
@@ -7,12 +7,12 @@ import { UsersController } from "../controllers/users.controller";
 export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
 
-    fastify.get<{ Querystring: { userId: string },Params:{} }>(
-        "/findById",
+    fastify.get<{ Params: { userId: string } }>(
+        "/:userId",
         {
             schema: {
-                querystring: {
-                    userId: { type: "string" },
+                params: {
+                    userId: { type: "string", minLength: 6 },
                 },
                 response: {
                     200: userSchema,
@@ -21,7 +21,7 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         },
         async (request, reply) => {
             try {
-                const result = await UsersController.getUserById(request.query.userId);
+                const result = await UsersController.getUserById(request.params.userId);
                 if (!result) throw new ApiError("User not found", 404);
                 reply.send(result);
             } catch (error) {
@@ -34,13 +34,12 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         }
     );
 
-
-    fastify.get<{ Querystring: { phoneOrEmail: string } }>(
-        "/findByPhoneOrEmail",
+    fastify.get<{ Params: { phoneOrEmail: string } }>(
+        "/findByPhoneOrEmail/:phoneOrEmail",
         {
             schema: {
-                querystring: {
-                    phoneOrEmail: { type: "string" },
+                params: {
+                    phoneOrEmail: { type: "string", minLength: 3 },
                 },
                 response: {
                     200: userSchema,
@@ -49,7 +48,7 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         },
         async (request, reply) => {
             try {
-                const result = await UsersController.findUserByPhoneOrEmail(request.query.phoneOrEmail);
+                const result = await UsersController.findUserByPhoneOrEmail(request.params.phoneOrEmail);
                 if (!result) throw new ApiError("User not found", 404);
                 reply.send(result);
             } catch (error) {

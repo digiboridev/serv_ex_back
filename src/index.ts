@@ -5,7 +5,7 @@ import { authRoutes } from "./routes/auth.routes";
 import { userRoutes } from "./routes/user.routes";
 import { companyRoutes } from "./routes/company.routes";
 import { usersRoutes } from "./routes/users.routes";
-
+import { catalogRoutes } from "./routes/catalog.routes";
 
 const fastify = Fastify({ logger: true });
 
@@ -14,6 +14,7 @@ fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(userRoutes, { prefix: "/user" });
 fastify.register(usersRoutes, { prefix: "/users" });
 fastify.register(companyRoutes, { prefix: "/company" });
+fastify.register(catalogRoutes, { prefix: "/catalog" });
 
 fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
 

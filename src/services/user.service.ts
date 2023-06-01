@@ -26,6 +26,20 @@ export class UserService {
         return null;
     }
 
+    // Search by first name, last name, phone, email
+    static async searchUsers(query: string): Promise<User[]> {
+        const users = await UserModel.find({
+            $or: [
+                { firstName: { $regex: query, $options: "i" } },
+                { lastName: { $regex: query, $options: "i" } },
+                { phone: { $regex: query, $options: "i" } },
+                { email: { $regex: query, $options: "i" } },
+            ],  
+        });
+
+        return users.map((user) => user.toEntity);
+    }
+
     static async createUser(firstName: string, lastName: string, phone: string, email: string, phoneVerified: boolean, emailVerified: boolean): Promise<User> {
         const user = await UserModel.create({
             firstName: firstName,
