@@ -5,6 +5,12 @@ export const categorySchema = {
         name: { type: "string" },
         imageUri: { type: "string" },
         parentId: { type: "string" },
+        issues: {
+            type: "array",
+            items: {
+                type: "string",
+            },
+        },
         createdAt: { type: "string" },
         updatedAt: { type: "string" },
     },

@@ -6,6 +6,9 @@ import { userRoutes } from "./routes/user.routes";
 import { companyRoutes } from "./routes/company.routes";
 import { usersRoutes } from "./routes/users.routes";
 import { catalogRoutes } from "./routes/catalog.routes";
+import { fillRsCat } from "./datamock";
+import { Issue, IssueModel } from "./models/issue";
+import { CategoryModel } from "./models/category";
 
 const fastify = Fastify({ logger: true });
 
@@ -34,5 +37,14 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
         process.exit(1);
     }
 
+
+
+    // await fillRsCat();
+
+    // const i = await IssueModel.findOne({ title: "Not working/Global" });
+
+    // const c = await CategoryModel.findOne({ name: "Cat 12" }).populate<{ issues: Issue[] }>("issues");
+    // c?.issues.map(i => console.log(i.title));
+    // console.log(c);
 
 })();
