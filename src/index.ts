@@ -8,7 +8,9 @@ import { usersRoutes } from "./routes/users.routes";
 import { catalogRoutes } from "./routes/catalog.routes";
 import { fillRsCat } from "./datamock";
 import { Issue, IssueModel } from "./models/issue";
-import { CategoryModel } from "./models/category";
+import { Category, CategoryModel } from "./models/category";
+import { OrderModel } from "./models/order/order";
+import { CustomerType } from "./models/order/customer_info";
 
 const fastify = Fastify({ logger: true });
 
@@ -37,14 +39,21 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
         process.exit(1);
     }
 
+    // const od =  new OrderModel({
+    //     customer_info: {
+            
+    //     }
+    // });
+    // const e = od.toEntity;
 
+    // console.log(od);
 
     // await fillRsCat();
 
-    // const i = await IssueModel.findOne({ title: "Not working/Global" });
+    // IssueModel.findOne({ title: "Not working/Global" });
+    // const c = await CategoryModel.findOne({ name: "Cat 22" }).populate({ path: "parent", populate: { path: "issues" } });
+    
+    // const o: Category | undefined = c?.toObject();
 
-    // const c = await CategoryModel.findOne({ name: "Cat 12" }).populate<{ issues: Issue[] }>("issues");
-    // c?.issues.map(i => console.log(i.title));
-    // console.log(c);
-
+    // console.log(o);
 })();
