@@ -1,36 +1,46 @@
 import { Schema, model } from "mongoose";
+import { Issue } from "./issue";
 
 export type Category = {
     id: string;
     name: string;
     imageUri?: string;
-    parent?: string;
-    issues: string[];
+    parentId?: string;
+    issuesIds: string[];
 };
 
 const CategorySchema = new Schema(
     {
         name: { type: String, required: true, minLength: 3 },
         imageUri: { type: String, required: false },
-        parent: { type: String, required: false, ref: "Category" },
-        issues: [{ type: String, ref: "Issue" }],
+        parentId: { type: String, required: false },
+        issuesIds: [{ type: String, required: true }],
     },
     {
         timestamps: false,
-        virtuals: {
-            toEntity: {
-                get: function (this: any): Category {
-                    return {
-                        id: this.id,
-                        name: this.name,
-                        imageUri: this.imageUri,
-                        parent: this.parent,
-                        issues: this.issues,
-                    };
-                },
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret._id;
+                delete ret.__v;
             },
         },
     }
 );
+
+CategorySchema.virtual("parent", {
+    ref: "Category",
+    localField: "parentId",
+    foreignField: "_id",
+    justOne: true,
+});
+
+CategorySchema.virtual("issues", {
+    ref: "Issue",
+    localField: "issuesIds",
+    foreignField: "_id",
+    justOne: false,
+});
 
 export const CategoryModel = model("Category", CategorySchema);

@@ -17,10 +17,10 @@ export async function fillRsCat() {
     const i4 = await IssueModel.create({ title: "Camera problems", description: "description4" });
     const i5 = await IssueModel.create({ title: "Sound problems", description: "description5" });
 
-    const c1 = await CategoryModel.create({ name: "Cat 1", parent: null });
-    const c2 = await CategoryModel.create({ name: "Cat 2", parent: null, issues: [i0._id.toString()] });
-    await CategoryModel.create({ name: "Cat 11", parent: c1._id.toString(), issues: [i1._id.toString(), i2._id.toString()] });
-    await CategoryModel.create({ name: "Cat 12", parent: c1._id.toString(), issues: [i3._id.toString(), i4._id.toString(), i5._id.toString()] });
-    await CategoryModel.create({ name: "Cat 21", parent: c2._id.toString(), issues: [i5._id.toString()] });
-    await CategoryModel.create({ name: "Cat 22", parent: c2._id.toString(), issues: [i1._id.toString(), i2._id.toString()] });
+    const c1 = await CategoryModel.create({ name: "Cat 1", parentId: null });
+    const c2 = await CategoryModel.create({ name: "Cat 2", parentId: null, issuesIds: [i0._id] });
+    await CategoryModel.create({ name: "Cat 11", parentId: c1._id, issuesIds: [i1._id, i2._id] });
+    await CategoryModel.create({ name: "Cat 12", parentId: c1._id, issuesIds: [i3._id, i4._id, i5._id] });
+    await CategoryModel.create({ name: "Cat 21", parentId: c2._id, issuesIds: [i5._id] });
+    await CategoryModel.create({ name: "Cat 22", parentId: c2._id, issuesIds: [i1._id, i2._id] });
 }

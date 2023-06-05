@@ -5,7 +5,7 @@ export const categorySchema = {
         name: { type: "string" },
         imageUri: { type: "string" },
         parentId: { type: "string" },
-        issues: {
+        issuesIds: {
             type: "array",
             items: {
                 type: "string",
