@@ -21,23 +21,7 @@ const IssueSchema = new Schema(
                 delete ret.__v;
             },
         },
-        // virtuals: {
-        //     id: {
-        //         get: function (this: any): string {
-        //             return this._id.toString();
-        //         },
-        //     },
-        //     toEntity: {
-        //         get: function (this: any): Issue {
-        //             return {
-        //                 id: this.id,
-        //                 title: this.title,
-        //                 description: this.description,
-        //             };
-        //         },
-        //     },
-        // },
     }
 );
 
-export const IssueModel = model<Issue>("Issue", IssueSchema);
+export const IssueModel = model("Issue", IssueSchema);

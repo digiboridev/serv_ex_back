@@ -10,24 +10,19 @@ export type UserContact = {
 
 const UserContactSchema = new Schema(
     {
-        userId: { type: String, required: true, ref: "User" },
+        userId: { type: String, required: true },
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
         phone: { type: String, required: true },
     },
     {
         timestamps: true,
-        virtuals: {
-            toEntity: {
-                get: function (this: any): UserContact {
-                    return {
-                        id: this.id,
-                        userId: this.userId,
-                        firstName: this.firstName,
-                        lastName: this.lastName,
-                        phone: this.phone,
-                    };
-                },
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret._id;
+                delete ret.__v;
             },
         },
     }

@@ -4,25 +4,25 @@ import { UserContact, UserContactModel } from "../models/user_contacts";
 export class UserService {
     static async getUserById(id: string): Promise<User | null> {
         const user = await UserModel.findById(id);
-        if (user) return user.toEntity;
+        if (user) return user.toObject();
         return null;
     }
 
     static async getUserByPhone(phone: string): Promise<User | null> {
         const user = await UserModel.findOne({ phone: phone });
-        if (user) return user.toEntity;
+        if (user) return user.toObject();
         return null;
     }
 
     static async getUserByEmail(email: string): Promise<User | null> {
         const user = await UserModel.findOne({ email: email });
-        if (user) return user.toEntity;
+        if (user) return user.toObject();
         return null;
     }
 
     static async findUserByPhoneOrEmail(phoneOrEmail: string): Promise<User | null> {
         const user = await UserModel.findOne({ $or: [{ phone: phoneOrEmail }, { email: phoneOrEmail }] });
-        if (user) return user.toEntity;
+        if (user) return user.toObject();
         return null;
     }
 
@@ -37,7 +37,7 @@ export class UserService {
             ],  
         });
 
-        return users.map((user) => user.toEntity);
+        return users.map((user) => user.toObject());
     }
 
     static async createUser(firstName: string, lastName: string, phone: string, email: string, phoneVerified: boolean, emailVerified: boolean): Promise<User> {
@@ -49,12 +49,12 @@ export class UserService {
             phoneVerified: phoneVerified,
             emailVerified: emailVerified,
         });
-        return user.toEntity;
+        return user.toObject();
     }
 
     static async userContacts(userId: string): Promise<UserContact[]> {
         const contacts = await UserContactModel.find({ userId });
-        return contacts.map((contact) => contact.toEntity);
+        return contacts.map((contact) => contact.toObject());
     }
 
     static async updateUserContacts(userId: string, contacts: { firstName: string; lastName: string; phone: string }[]): Promise<UserContact[]> {
@@ -68,6 +68,6 @@ export class UserService {
         });
         await UserContactModel.deleteMany({ userId });
         const newContacts = await UserContactModel.insertMany(userContacts);
-        return newContacts.map((contact) => contact.toEntity);
+        return newContacts.map((contact) => contact.toObject());
     }
 }

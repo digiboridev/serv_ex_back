@@ -12,29 +12,29 @@ export type Company = {
 
 const CompanySchema = new Schema(
     {   
-        name: { type: String, required: true },
+        name: { type: String, required: true, },
         email: { type: String, required: true, unique: true },
         publicId: { type: String, required: true, unique: true },
-        members: [{ type: String, ref: "User" }],
+        membersIds: [{ type: String, required: true}],
     },
     {
         timestamps: true,
-        virtuals: {
-            toEntity: {
-                get: function (this: any): Company {
-                    return {
-                        id: this.id,
-                        name: this.name,
-                        email: this.email,
-                        publicId: this.publicId,
-                        membersIds: this.members,
-                        createdAt: this.createdAt,
-                        updatedAt: this.updatedAt,
-                    };
-                },
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret._id;
+                delete ret.__v;
             },
         },
     }
 );
+
+CompanySchema.virtual("members", {
+    ref: "User",
+    localField: "membersIds",
+    foreignField: "_id",
+    justOne: false,
+});
 
 export const CompanyModel = model("Company", CompanySchema);

@@ -26,22 +26,13 @@ const UserSchema = new Schema(
     },
     {
         timestamps: true,
-        virtuals: {
-            toEntity: {
-                get: function (this: any): User {
-                    return {
-                        id: this.id,
-                        firstName: this.firstName,
-                        lastName: this.lastName,
-                        phone: this.phone,
-                        email: this.email,
-                        phoneVerified: this.phoneVerified,
-                        emailVerified: this.emailVerified,
-                        createdAt: this.createdAt,
-                        updatedAt: this.updatedAt,
-                    };
-                },
-            }
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret._id;
+                delete ret.__v;
+            },
         },
     }
 );
