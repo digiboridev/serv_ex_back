@@ -1,46 +1,43 @@
-
-
 import { Schema } from "mongoose";
+import { DevicePassword, DevicePasswordSchema } from "./device_password";
 
 export type OrderDetails = {
     categoryId: string;
     issueIds: string[];
     description: string;
     deviceWet: boolean;
-    wetDescription: string;
+    wetDescription?: string;
     accesoriesIncluded: boolean;
-    accesoriesDescription: string;
+    accesoriesDescription?: string;
     hasWaranty: boolean;
+    password: DevicePassword;
 };
 
 export const OrderDetailsSchema = new Schema(
     {
         categoryId: { type: String, required: true },
-        issueIds: [{ type: String, required: true }],
+        issueIds: {
+            type: Array,
+            items: { type: String, required: true },
+            required: true,
+        },
         description: { type: String, required: true },
         deviceWet: { type: Boolean, required: true },
-        wetDescription: { type: String, required: true },
+        wetDescription: { type: String, required: false },
         accesoriesIncluded: { type: Boolean, required: true },
-        accesoriesDescription: { type: String, required: true },
+        accesoriesDescription: { type: String, required: false },
         hasWaranty: { type: Boolean, required: true },
+        password: { type: DevicePasswordSchema, required: false },
     },
     {
         _id: false,
-        virtuals: {
-            toEntity: {
-                get: function (this: any): OrderDetails {
-                    return {
-                        categoryId: this.categoryId,
-                        issueIds: this.issueIds,
-                        description: this.description,
-                        deviceWet: this.deviceWet,
-                        wetDescription: this.wetDescription,
-                        accesoriesIncluded: this.accesoriesIncluded,
-                        accesoriesDescription: this.accesoriesDescription,
-                        hasWaranty: this.hasWaranty,
-                    };
-                },
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret.__v;
             },
         },
+        strictQuery: false,
     }
 );

@@ -17,15 +17,14 @@ export const CustomerInfoSchema = new Schema(
     },
     {
         _id: false,
-        virtuals: {
-            toEntity: {
-                get: function (this: any): CustomerInfo {
-                    return {
-                        customerType: this.customerType,
-                        customerId: this.customerId,
-                    };
-                },
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret.__v;
             },
         },
     }
 );
+
+
