@@ -26,7 +26,10 @@ const OrderSchema = new Schema(
     {
         customerInfo: { type: CustomerInfoSchema, required: true },
         details: { type: OrderDetailsSchema, required: true },
-        status: OrderStatusSchema,
+        status: {
+            type: OrderStatusSchema,
+            default: {},
+        },
         paymentStatus: {
             type: String,
             enum: ["notPaid", "paid"],

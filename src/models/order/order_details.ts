@@ -38,6 +38,5 @@ export const OrderDetailsSchema = new Schema(
                 delete ret.__v;
             },
         },
-        strictQuery: false,
     }
 );

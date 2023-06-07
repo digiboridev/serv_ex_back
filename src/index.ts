@@ -39,21 +39,28 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
         process.exit(1);
     }
 
-    // const od =  new OrderModel({
-    //     customer_info: {
-            
-    //     }
+    // const od = await OrderModel.create({
+    //     customerInfo: {
+    //         customerType: CustomerType.personal,
+    //         customerId: "123123123",
+    //     },
+    //     details: {
+    //         categoryId: "123",
+    //         issueIds: ["123", "123"],
+    //         description: "desc",
+    //         deviceWet: true,
+    //         wetDescription: "toilet water",
+    //         accesoriesIncluded: false,
+    //         accesoriesDescription: '',
+    //         hasWaranty: false,
+    //         password: {
+    //             type: "pattern",
+    //             dimensions: 3,
+    //             points: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    //         },
+    //     },
     // });
-    // const e = od.toEntity;
+    // const e = od.toObject();
 
     // console.log(od);
-
-    // await fillRsCat();
-
-    // IssueModel.findOne({ title: "Not working/Global" });
-    // const c = await CategoryModel.findOne({ name: "Cat 22" }).populate({ path: "parent", populate: { path: "issues" } });
-    
-    // const o: Category | undefined = c?.toObject();
-
-    // console.log(o);
 })();
