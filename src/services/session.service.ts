@@ -2,7 +2,7 @@ import { Session, SessionModel } from "../models/session";
 
 export class SessionService {
     static async createSession(userId: string): Promise<Session> {
-        return await SessionModel.create({ user: userId });
+        return await SessionModel.create({ userId: userId });
     }
 
     static async getSessionById(id: string): Promise<Session | null> {
