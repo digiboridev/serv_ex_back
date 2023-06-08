@@ -17,15 +17,31 @@ export const OrderDetailsSchema = new Schema(
     {
         categoryId: { type: String, required: true },
         issueIds: {
-            type: Array,
-            items: { type: String, required: true },
+            type: [String],
+            minlength: 1,
             required: true,
         },
         description: { type: String, required: true },
         deviceWet: { type: Boolean, required: true },
-        wetDescription: { type: String, required: false },
+        wetDescription: {
+            type: String,
+            required: [
+                function (this: OrderDetails) {
+                    return this.deviceWet;
+                },
+                "Wet description is required when device is wet",
+            ],
+        },
         accesoriesIncluded: { type: Boolean, required: true },
-        accesoriesDescription: { type: String, required: false },
+        accesoriesDescription: {
+            type: String,
+            required: [
+                function (this: OrderDetails) {
+                    return this.accesoriesIncluded;
+                },
+                "Accesories description is required when accesories are included",
+            ],
+        },
         hasWaranty: { type: Boolean, required: true },
         password: { type: DevicePasswordSchema, required: false },
     },

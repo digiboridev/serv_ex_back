@@ -39,28 +39,32 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
         process.exit(1);
     }
 
-    // const od = await OrderModel.create({
-    //     customerInfo: {
-    //         customerType: CustomerType.personal,
-    //         customerId: "123123123",
-    //     },
-    //     details: {
-    //         categoryId: "123",
-    //         issueIds: ["123", "123"],
-    //         description: "desc",
-    //         deviceWet: true,
-    //         wetDescription: "toilet water",
-    //         accesoriesIncluded: false,
-    //         accesoriesDescription: '',
-    //         hasWaranty: false,
-    //         password: {
-    //             type: "pattern",
-    //             dimensions: 3,
-    //             points: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    // try {
+    //     const od = await OrderModel.create({
+    //         customerInfo: {
+    //             customerType: CustomerType.personal,
+    //             customerId: "123123123",
     //         },
-    //     },
-    // });
-    // const e = od.toObject();
-
-    // console.log(od);
+    //         details: {
+    //             categoryId: "123",
+    //             issueIds: ["123", "123"],
+    //             description: "desc",
+    //             deviceWet: true,
+    //             wetDescription: "toilet water",
+    //             accesoriesIncluded: true,
+    //             accesoriesDescription: "x2 chargers",
+    //             hasWaranty: false,
+    //             password: {
+    //                 type: "numeric",
+    //                 password: "123123",
+    //                 // dimensions: 3,
+    //                 // points: [1, 2, 3, 4, 5, 6, 7, 8],
+    //             },
+    //         },
+    //     });
+    //     const e = od.toObject();
+    //     console.log(od);
+    // } catch (error) {
+    //     console.error(error);
+    // }
 })();

@@ -39,7 +39,7 @@ export class AuthController {
         const session = await SessionService.getSessionById(sessionId);
         if (!session) throw new ApiError("Session expired", 403);
 
-        const user = await UserService.getUserById(session.user);
+        const user = await UserService.getUserById(session.userId);
         if (!user) throw new ApiError("Invalid user", 404);
 
         const newRefreshToken = this.signRefreshToken(session.id);

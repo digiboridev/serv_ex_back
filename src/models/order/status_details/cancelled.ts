@@ -8,17 +8,20 @@ export enum CancellationReasons {
     other = "other",
 }
 
-export enum CancelledActor {
-    customer = "customer",
-    employee = "employee",
-}
-
-export type OrderCancellDetails = {
+export type OrderCancelledByCustomer = {
     reason: CancellationReasons;
     description?: string;
-    actor: CancelledActor;
-    employeeId?: string;
+    actor: "customer";
 };
+
+export type OrderCancelledByEmployee = {
+    reason: CancellationReasons;
+    description?: string;
+    actor: "employee";
+    employeeId: string;
+};
+
+export type OrderCancellDetails = OrderCancelledByCustomer | OrderCancelledByEmployee;
 
 export const OrderCancellDetailsSchema = new Schema(
     {
@@ -27,13 +30,29 @@ export const OrderCancellDetailsSchema = new Schema(
             enum: ["notAvailable", "notInterested", "notWorking", "notWorthRepair", "other"],
             required: true,
         },
-        description: { type: String },
+        description: {
+            type: String,
+            required: [
+                function (this: OrderCancellDetails) {
+                    return this.reason === "other";
+                },
+                "description is required for other reason",
+            ],
+        },
         actor: {
             type: String,
             enum: ["customer", "employee"],
             required: true,
         },
-        employeeId: { type: String },
+        employeeId: {
+            type: String,
+            required: [
+                function (this: OrderCancellDetails) {
+                    return this.actor === "employee";
+                },
+                "employeeId is required for employee cancellations",
+            ],
+        },
     },
     {
         _id: false,

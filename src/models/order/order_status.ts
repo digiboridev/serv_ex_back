@@ -57,16 +57,101 @@ export const OrderStatusSchema = new Schema(
             ],
             default: "newOrder",
         },
-        acceptedDetails: OrderAcceptDetailsSchema,
-        onDiagnosticDetails: OrderDiagnosticDetailsSchema,
-        offerCreatedDetails: OrderOfferCreatedDetailsSchema,
-        confirmedOfferDetails: OrderConfirmedOfferDetailsSchema,
-        declinedOfferDetails: OrderDeclinedOfferDetailsSchema,
-        waitingForPartsDetails: OrderWaitingForPartsDetailsSchema,
-        inProgressDetails: OrderInProgressDetailsSchema,
-        workFinishedDetails: OrderWorkFinishedDetailsSchema,
-        closedDetails: OrderClosedDetailsSchema,
-        cancellDetails: OrderCancellDetailsSchema,
+        acceptedDetails: {
+            type: OrderAcceptDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "accepted";
+                },
+                "acceptedDetails is required when currentStatus is accepted",
+            ],
+        },
+        onDiagnosticDetails: {
+            type: OrderDiagnosticDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "onDiagnostic";
+                },
+                "onDiagnosticDetails is required when currentStatus is onDiagnostic",
+            ],
+        },
+        offerCreatedDetails: {
+            type: OrderOfferCreatedDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "offerCreated";
+                },
+                "offerCreatedDetails is required when currentStatus is offerCreated",
+            ],
+        },
+
+        confirmedOfferDetails: {
+            type: OrderConfirmedOfferDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "confirmedOffer";
+                },
+                "confirmedOfferDetails is required when currentStatus is confirmedOffer",
+            ],
+        },
+
+        declinedOfferDetails: {
+            type: OrderDeclinedOfferDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "declinedOffer";
+                },
+                "declinedOfferDetails is required when currentStatus is declinedOffer",
+            ],
+        },
+
+        waitingForPartsDetails: {
+            type: OrderWaitingForPartsDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "waitingForParts";
+                },
+                "waitingForPartsDetails is required when currentStatus is waitingForParts",
+            ],
+        },
+
+        inProgressDetails: {
+            type: OrderInProgressDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "inProgress";
+                },
+                "inProgressDetails is required when currentStatus is inProgress",
+            ],
+        },
+        workFinishedDetails: {
+            type: OrderWorkFinishedDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "workFinished";
+                },
+                "workFinishedDetails is required when currentStatus is workFinished",
+            ],
+        },
+
+        closedDetails: {
+            type: OrderClosedDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "closed";
+                },
+                "closedDetails is required when currentStatus is closed",
+            ],
+        },
+        cancellDetails: {
+            type: OrderCancellDetailsSchema,
+            required: [
+                function (this: OrderStatus) {
+                    return this.currentStatus === "canceled";
+                },
+                "cancellDetails is required when currentStatus is canceled",
+            ],
+        },
     },
     {
         _id: false,

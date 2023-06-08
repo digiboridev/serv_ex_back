@@ -1,7 +1,6 @@
 import { Schema } from "mongoose";
 import { RepairPart, RepairPartSchema } from "./value_objects/repair_parts";
 
-
 export type OrderOfferCreatedDetails = {
     employeeId: string;
     employeeNick: string;
@@ -14,7 +13,6 @@ export type OrderOfferCreatedDetails = {
     parts: RepairPart[];
 };
 
-
 export const OrderOfferCreatedDetailsSchema = new Schema(
     {
         employeeId: { type: String, required: true },
@@ -25,7 +23,7 @@ export const OrderOfferCreatedDetailsSchema = new Schema(
         noteForClient: { type: String, required: true },
         noteForEmployee: { type: String, required: true },
         afterDiagnostic: { type: Boolean, required: true },
-        parts: { type: Array, items: { type: RepairPartSchema, required: true }, required: true },
+        parts: { type: [RepairPartSchema], required: true },
     },
     {
         _id: false,
@@ -34,7 +32,7 @@ export const OrderOfferCreatedDetailsSchema = new Schema(
             getters: true,
             transform: function (doc, ret) {
                 delete ret.__v;
-            }
-        }
+            },
+        },
     }
 );
