@@ -1,12 +1,7 @@
 import { Schema } from "mongoose";
 
-export enum CustomerType {
-    personal = "personal",
-    company = "company",
-}
-
 export type CustomerInfo = {
-    customerType: CustomerType;
+    customerType: "personal" | "company";
     customerId: string;
 };
 
@@ -26,5 +21,3 @@ export const CustomerInfoSchema = new Schema(
         },
     }
 );
-
-

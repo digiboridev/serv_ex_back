@@ -21,17 +21,9 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CatalogController.getCategoryById(request.params.id);
-                if (!result) throw new ApiError("Category not found", 404);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CatalogController.getCategoryById(request.params.id);
+            if (!result) throw new ApiError("Category not found", 404);
+            reply.send(result);
         }
     );
 
@@ -51,16 +43,8 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CatalogController.getCategories(request.params.id);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CatalogController.getCategories(request.params.id);
+            reply.send(result);
         }
     );
 
@@ -80,16 +64,8 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CatalogController.getIssuesByCategory(request.params.id);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CatalogController.getIssuesByCategory(request.params.id);
+            reply.send(result);
         }
     );
 
@@ -106,16 +82,8 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CatalogController.getCategories();
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CatalogController.getCategories();
+            reply.send(result);
         }
     );
 
@@ -132,20 +100,11 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CatalogController.getIssue(request.params.id);
-                if (!result) throw new ApiError("Issue not found", 404);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CatalogController.getIssue(request.params.id);
+            if (!result) throw new ApiError("Issue not found", 404);
+            reply.send(result);
         }
     );
-    
 
     done();
 };

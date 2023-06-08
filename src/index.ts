@@ -10,7 +10,8 @@ import { fillRsCat } from "./datamock";
 import { Issue, IssueModel } from "./models/issue";
 import { Category, CategoryModel } from "./models/category";
 import { OrderModel } from "./models/order/order";
-import { CustomerType } from "./models/order/customer_info";
+import { orderRoutes } from "./routes/order.routes";
+import { ApiError, errorMessage } from "./utils/errors";
 
 const fastify = Fastify({ logger: true });
 
@@ -20,6 +21,16 @@ fastify.register(userRoutes, { prefix: "/user" });
 fastify.register(usersRoutes, { prefix: "/users" });
 fastify.register(companyRoutes, { prefix: "/company" });
 fastify.register(catalogRoutes, { prefix: "/catalog" });
+fastify.register(orderRoutes, { prefix: "/orders" });
+
+fastify.addHook("onError", async (request, reply, error) => {
+    console.error(error);
+    if (error instanceof ApiError) {
+        reply.status(error.code).send({ error: error.message });
+    } else {
+        reply.status(500).send({ error: errorMessage(error) });
+    }
+});
 
 fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
 
@@ -42,7 +53,7 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
     // try {
     //     const od = await OrderModel.create({
     //         customerInfo: {
-    //             customerType: CustomerType.personal,
+    //             customerType: 'personal',
     //             customerId: "123123123",
     //         },
     //         details: {

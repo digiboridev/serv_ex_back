@@ -21,16 +21,8 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CompanyController.getCompaniesByMemberId(request.userId);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CompanyController.getCompaniesByMemberId(request.userId);
+            reply.send(result);
         }
     );
 
@@ -45,16 +37,8 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CompanyController.createCompany(request.body.name, request.body.email, request.body.publicId, request.userId);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CompanyController.createCompany(request.body.name, request.body.email, request.body.publicId, request.userId);
+            reply.send(result);
         }
     );
 
@@ -76,16 +60,8 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            try {
-                const result = await CompanyController.updateMembers(request.body.companyId, request.body.membersIds, request.userId);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await CompanyController.updateMembers(request.body.companyId, request.body.membersIds, request.userId);
+            reply.send(result);
         }
     );
 

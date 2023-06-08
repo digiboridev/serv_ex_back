@@ -20,17 +20,9 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
             },
         },
         async (request, reply) => {
-            try {
-                const result = await UsersController.getUserById(request.params.userId);
-                if (!result) throw new ApiError("User not found", 404);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await UsersController.getUserById(request.params.userId);
+            if (!result) throw new ApiError("User not found", 404);
+            reply.send(result);
         }
     );
 
@@ -47,17 +39,9 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
             },
         },
         async (request, reply) => {
-            try {
-                const result = await UsersController.findUserByPhoneOrEmail(request.params.phoneOrEmail);
-                if (!result) throw new ApiError("User not found", 404);
-                reply.send(result);
-            } catch (error) {
-                if (error instanceof ApiError) {
-                    reply.status(error.code).send({ error: error.message });
-                } else {
-                    reply.status(500).send({ error: errorMessage(error) });
-                }
-            }
+            const result = await UsersController.findUserByPhoneOrEmail(request.params.phoneOrEmail);
+            if (!result) throw new ApiError("User not found", 404);
+            reply.send(result);
         }
     );
 
