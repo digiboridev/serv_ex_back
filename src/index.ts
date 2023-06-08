@@ -6,10 +6,6 @@ import { userRoutes } from "./routes/user.routes";
 import { companyRoutes } from "./routes/company.routes";
 import { usersRoutes } from "./routes/users.routes";
 import { catalogRoutes } from "./routes/catalog.routes";
-import { fillRsCat } from "./datamock";
-import { Issue, IssueModel } from "./models/issue";
-import { Category, CategoryModel } from "./models/category";
-import { OrderModel } from "./models/order/order";
 import { orderRoutes } from "./routes/order.routes";
 import { ApiError, errorMessage } from "./utils/errors";
 
@@ -50,32 +46,5 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
         process.exit(1);
     }
 
-    // try {
-    //     const od = await OrderModel.create({
-    //         customerInfo: {
-    //             customerType: 'personal',
-    //             customerId: "123123123",
-    //         },
-    //         details: {
-    //             categoryId: "123",
-    //             issueIds: ["123", "123"],
-    //             description: "desc",
-    //             deviceWet: true,
-    //             wetDescription: "toilet water",
-    //             accesoriesIncluded: true,
-    //             accesoriesDescription: "x2 chargers",
-    //             hasWaranty: false,
-    //             password: {
-    //                 type: "numeric",
-    //                 password: "123123",
-    //                 // dimensions: 3,
-    //                 // points: [1, 2, 3, 4, 5, 6, 7, 8],
-    //             },
-    //         },
-    //     });
-    //     const e = od.toObject();
-    //     console.log(od);
-    // } catch (error) {
-    //     console.error(error);
-    // }
+
 })();

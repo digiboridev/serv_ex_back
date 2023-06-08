@@ -7,6 +7,7 @@ import { userContactCreateSchema, userContactSchema } from "../schemas/user_cont
 import { NewOrder } from "../dto/new_order";
 import { newOrderSchema } from "../schemas/new_order.schema";
 import { OrderController } from "../controllers/orders.controller";
+import { CustomerInfo } from "../models/order/customer_info";
 
 export const orderRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
@@ -20,6 +21,45 @@ export const orderRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         },
         async (request, reply) => {
             const order = await OrderController.createOrder(request.userId, request.body);
+            reply.send(order);
+        }
+    );
+
+    fastify.get<{ Querystring: CustomerInfo }>(
+        "/customer-orders",
+        {
+            schema: {
+                querystring: {
+                    type: "object",
+                    properties: {
+                        customerType: { type: "string", enum: ["personal", "company"] },
+                        customerId: { type: "string" },
+                    },
+                    required: ["customerType", "customerId"],
+                },
+            },
+        },
+        async (request, reply) => {
+            const orders = await OrderController.getCustomerOrders(request.userId, request.query);
+            reply.send(orders);
+        }
+    );
+
+    fastify.get<{ Params: { orderId: string } }>(
+        "/customer-orders/:orderId",
+        {
+            schema: {
+                params: {
+                    type: "object",
+                    properties: {
+                        orderId: { type: "string" },
+                    },
+                    required: ["orderId"],
+                },
+            },
+        },
+        async (request, reply) => {
+            const order = await OrderController.getOrderById(request.userId, request.params.orderId);
             reply.send(order);
         }
     );

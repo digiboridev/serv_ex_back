@@ -1,4 +1,5 @@
 import { NewOrder } from "../dto/new_order";
+import { CustomerInfo } from "../models/order/customer_info";
 import { Order, OrderModel } from "../models/order/order";
 
 export class OrderService {
@@ -18,5 +19,15 @@ export class OrderService {
             },
         });
         return newOrder.toObject();
+    }
+
+    static async getCustomerOrders(customerId: string): Promise<Order[]> {
+        const orders = await OrderModel.find({ "customerInfo.customerId": customerId });
+        return orders.map((order) => order.toObject());
+    }
+
+    static async getOrderById(orderId: string): Promise<Order | null> {
+        const order = await OrderModel.findById(orderId);
+        return order?.toObject() ?? null;
     }
 }
