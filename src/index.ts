@@ -6,7 +6,7 @@ import { userRoutes } from "./routes/user.routes";
 import { companyRoutes } from "./routes/company.routes";
 import { usersRoutes } from "./routes/users.routes";
 import { catalogRoutes } from "./routes/catalog.routes";
-import { orderRoutes } from "./routes/order.routes";
+import { ordersRoutes } from "./routes/orders.routes";
 import { ApiError, errorMessage } from "./utils/errors";
 
 const fastify = Fastify({ logger: true });
@@ -17,7 +17,7 @@ fastify.register(userRoutes, { prefix: "/user" });
 fastify.register(usersRoutes, { prefix: "/users" });
 fastify.register(companyRoutes, { prefix: "/company" });
 fastify.register(catalogRoutes, { prefix: "/catalog" });
-fastify.register(orderRoutes, { prefix: "/orders" });
+fastify.register(ordersRoutes, { prefix: "/orders" });
 
 fastify.addHook("onError", async (request, reply, error) => {
     console.error(error);

@@ -9,7 +9,7 @@ import { newOrderSchema } from "../schemas/new_order.schema";
 import { OrderController } from "../controllers/orders.controller";
 import { CustomerInfo } from "../models/order/customer_info";
 
-export const orderRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
+export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
 
     fastify.post<{ Body: NewOrder }>(
