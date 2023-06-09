@@ -17,8 +17,7 @@ export const companyCreateSchema = {
         name: { type: "string" },
         email: { type: "string", format: "email" },
         publicId: { type: "string" },
+        membersIds: { type: "array", items: { type: "string" } },
     },
     required: ["name", "email", "publicId"],
 };
-
-

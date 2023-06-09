@@ -2,14 +2,16 @@ import { Schema, model } from "mongoose";
 
 export type Session = {
     id: string;
-    userId: string;
+    entityId: string;
+    scope: "client" | "vendor";
     createdAt: Date;
     updatedAt: Date;
 };
 
 const SessionSchema = new Schema(
     {
-        userId: { type: String, required: true },
+        entityId: { type: String, required: true },
+        scope: { type: String, enum: ["client", "vendor"], required: true },
         ttl: {
             type: Date,
             default: () => {

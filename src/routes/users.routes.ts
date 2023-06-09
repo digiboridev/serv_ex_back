@@ -1,5 +1,4 @@
 import { FastifyInstance } from "fastify";
-import { ApiError, errorMessage } from "../utils/errors";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { userSchema } from "../schemas/user.schema";
 import { UsersController } from "../controllers/users.controller";
@@ -21,7 +20,6 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         },
         async (request, reply) => {
             const result = await UsersController.getUserById(request.params.userId);
-            if (!result) throw new ApiError("User not found", 404);
             reply.send(result);
         }
     );
@@ -40,7 +38,6 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         },
         async (request, reply) => {
             const result = await UsersController.findUserByPhoneOrEmail(request.params.phoneOrEmail);
-            if (!result) throw new ApiError("User not found", 404);
             reply.send(result);
         }
     );

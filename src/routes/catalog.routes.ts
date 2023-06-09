@@ -1,5 +1,4 @@
 import { FastifyInstance } from "fastify";
-import { ApiError, errorMessage } from "../utils/errors";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { CatalogController } from "../controllers/catalog.controller";
 import { categorySchema } from "../schemas/category.schema";
@@ -22,7 +21,6 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
         },
         async (request, reply) => {
             const result = await CatalogController.getCategoryById(request.params.id);
-            if (!result) throw new ApiError("Category not found", 404);
             reply.send(result);
         }
     );
@@ -101,7 +99,6 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
         },
         async (request, reply) => {
             const result = await CatalogController.getIssue(request.params.id);
-            if (!result) throw new ApiError("Issue not found", 404);
             reply.send(result);
         }
     );

@@ -1,10 +1,15 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { AuthController } from "../controllers/auth.controller";
 import { errorMessage } from "../utils/errors";
+import { AuthData } from "../models/auth_data";
+import { AuthService } from "../services/auth.service";
+
+
+
+
 
 declare module "fastify" {
     interface FastifyRequest {
-        userId: string;
+        authData: AuthData;
     }
 }
 
@@ -14,12 +19,13 @@ export const authMiddleware = async (request: FastifyRequest, reply: FastifyRepl
         reply.status(401).send("No token provided");
         console.log("auth middleware:", "no token provided");
         return;
+
     }
 
     try {
-        const userId = AuthController.verifyAccessToken(token);
-        request.userId = userId;
-        console.log("auth middleware:", "token verified", userId);
+        const authData = AuthService.verifyAccessToken(token);
+        request.authData = authData;
+        console.log("auth middleware:", "token verified", authData);
     } catch (error) {
         reply.status(401).send(errorMessage(error));
         console.log("auth middleware:", error);

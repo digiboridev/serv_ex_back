@@ -1,9 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { ApiError, errorMessage } from "../utils/errors";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { UserController } from "../controllers/user.controller";
-import { userSchema } from "../schemas/user.schema";
-import { userContactCreateSchema, userContactSchema } from "../schemas/user_contact.schema";
 import { NewOrder } from "../dto/new_order";
 import { newOrderSchema } from "../schemas/new_order.schema";
 import { OrderController } from "../controllers/orders.controller";
@@ -11,19 +7,6 @@ import { CustomerInfo } from "../models/order/customer_info";
 
 export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
-
-    fastify.post<{ Body: NewOrder }>(
-        "/create-order",
-        {
-            schema: {
-                body: newOrderSchema,
-            },
-        },
-        async (request, reply) => {
-            const order = await OrderController.createOrder(request.userId, request.body);
-            reply.send(order);
-        }
-    );
 
     fastify.get<{ Querystring: CustomerInfo }>(
         "/customer-orders",
@@ -40,7 +23,7 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
             },
         },
         async (request, reply) => {
-            const orders = await OrderController.getCustomerOrders(request.userId, request.query);
+            const orders = await OrderController.getCustomerOrders(request.authData, request.query);
             reply.send(orders);
         }
     );
@@ -59,7 +42,20 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
             },
         },
         async (request, reply) => {
-            const order = await OrderController.getOrderById(request.userId, request.params.orderId);
+            const order = await OrderController.getCustomerOrderById(request.authData, request.params.orderId);
+            reply.send(order);
+        }
+    );
+
+    fastify.post<{ Body: NewOrder }>(
+        "/customer-orders",
+        {
+            schema: {
+                body: newOrderSchema,
+            },
+        },
+        async (request, reply) => {
+            const order = await OrderController.createCustomerOrder(request.authData, request.body);
             reply.send(order);
         }
     );

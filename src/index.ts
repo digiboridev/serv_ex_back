@@ -3,7 +3,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { authRoutes } from "./routes/auth.routes";
 import { userRoutes } from "./routes/user.routes";
-import { companyRoutes } from "./routes/company.routes";
+import { companiesRoutes } from "./routes/companies.routes";
 import { usersRoutes } from "./routes/users.routes";
 import { catalogRoutes } from "./routes/catalog.routes";
 import { ordersRoutes } from "./routes/orders.routes";
@@ -15,7 +15,7 @@ fastify.register(cors, {});
 fastify.register(authRoutes, { prefix: "/auth" });
 fastify.register(userRoutes, { prefix: "/user" });
 fastify.register(usersRoutes, { prefix: "/users" });
-fastify.register(companyRoutes, { prefix: "/company" });
+fastify.register(companiesRoutes, { prefix: "/companies" });
 fastify.register(catalogRoutes, { prefix: "/catalog" });
 fastify.register(ordersRoutes, { prefix: "/orders" });
 

@@ -1,11 +1,9 @@
 import { FastifyInstance } from "fastify";
-import { ApiError, errorMessage } from "../utils/errors";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { UserController } from "../controllers/user.controller";
-import { CompanyController } from "../controllers/company.controller";
+import { CompaniesController } from "../controllers/companies.controller";
 import { companyCreateSchema, companySchema } from "../schemas/company.schema";
 
-export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
+export const companiesRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
 
     fastify.get(
@@ -21,12 +19,12 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CompanyController.getCompaniesByMemberId(request.userId);
+            const result = await CompaniesController.getUserCompanies(request.authData);
             reply.send(result);
         }
     );
 
-    fastify.post<{ Body: { name: string; email: string; publicId: string } }>(
+    fastify.post<{ Body: { name: string; email: string; publicId: string; membersIds: string[] } }>(
         "/create-company",
         {
             schema: {
@@ -37,7 +35,13 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CompanyController.createCompany(request.body.name, request.body.email, request.body.publicId, request.userId);
+            const result = await CompaniesController.createCompany(
+                request.body.name,
+                request.body.email,
+                request.body.publicId,
+                request.body.membersIds,
+                request.authData
+            );
             reply.send(result);
         }
     );
@@ -60,7 +64,7 @@ export const companyRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CompanyController.updateMembers(request.body.companyId, request.body.membersIds, request.userId);
+            const result = await CompaniesController.updateMembers(request.body.companyId, request.body.membersIds, request.authData);
             reply.send(result);
         }
     );

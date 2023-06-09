@@ -1,18 +1,21 @@
 import { User } from "../models/user";
-import { UserContact } from "../models/user_contacts";
 import { UserService } from "../services/user.service";
+import { ApiError } from "../utils/errors";
 
 export class UsersController {
-    static async getUserById(userId: string): Promise<User | null> {
-        return UserService.getUserById(userId);
+    static async getUserById(userId: string): Promise<User> {
+        const user = await UserService.getUserById(userId);
+        if (!user) throw new ApiError("User not found", 404);
+        return user;
     }
 
-    static async findUserByPhoneOrEmail(phoneOrEmail: string): Promise<User | null> {
-        return UserService.findUserByPhoneOrEmail(phoneOrEmail);
+    static async findUserByPhoneOrEmail(phoneOrEmail: string): Promise<User> {
+        const user = await UserService.findUserByPhoneOrEmail(phoneOrEmail);
+        if (!user) throw new ApiError("User not found", 404);
+        return user;
     }
 
     static async searchUsers(query: string): Promise<User[]> {
         return UserService.searchUsers(query);
     }
-    
 }

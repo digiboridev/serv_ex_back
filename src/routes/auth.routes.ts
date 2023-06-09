@@ -15,16 +15,6 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
                     },
                     required: ["grant_type", "refresh_token"],
                 },
-                response: {
-                    200: {
-                        type: "object",
-                        properties: {
-                            userId: { type: "string" },
-                            refreshToken: { type: "string" },
-                            accessToken: { type: "string" },
-                        },
-                    },
-                },
             },
         },
         async (request, reply) => {
@@ -34,7 +24,7 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
     );
 
     fastify.post<{ Body: { phoneNumber: string } }>(
-        "/phone-signin",
+        "/client/phone-signin",
         {
             schema: {
                 body: {
@@ -44,25 +34,16 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
                     },
                     required: ["phoneNumber"],
                 },
-                response: {
-                    200: {
-                        type: "object",
-                        properties: {
-                            status: { type: "string" },
-                            token: { type: "string" },
-                        },
-                    },
-                },
             },
         },
         async (request, reply) => {
-            const result = await AuthController.phoneSignIn(request.body.phoneNumber);
+            const result = await AuthController.phoneSignInClient(request.body.phoneNumber);
             reply.send({ status: "code sent", token: result });
         }
     );
 
     fastify.post<{ Body: { code: string; token: string } }>(
-        "/verify-code",
+        "/client/verify-code",
         {
             schema: {
                 body: {
@@ -73,22 +54,10 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
                     },
                     required: ["code", "token"],
                 },
-                response: {
-                    200: {
-                        type: "object",
-                        properties: {
-                            status: { type: "string" },
-                            userId: { type: "string" },
-                            refreshToken: { type: "string" },
-                            accessToken: { type: "string" },
-                            registrationToken: { type: "string" },
-                        },
-                    },
-                },
             },
         },
         async (request, reply) => {
-            const result = await AuthController.verifyCode(request.body.token, request.body.code);
+            const result = await AuthController.verifyPhoneCodeClient(request.body.token, request.body.code);
             if ("registrationToken" in result) {
                 reply.send({ status: "registration_required", ...result });
             } else {
@@ -98,7 +67,7 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
     );
 
     fastify.post<{ Body: { registrationToken: string; phone: string; firstName: string; lastName: string; email: string } }>(
-        "/register",
+        "/client/register",
         {
             schema: {
                 body: {
@@ -112,23 +81,32 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
                     },
                     required: ["registrationToken", "phone", "firstName", "lastName", "email"],
                 },
-                response: {
-                    200: {
-                        type: "object",
-                        properties: {
-                            status: { type: "string" },
-                            userId: { type: "string" },
-                            refreshToken: { type: "string" },
-                            accessToken: { type: "string" },
-                        },
-                    },
-                },
             },
         },
         async (request, reply) => {
             const data = request.body;
-            const result = await AuthController.register(data.registrationToken, data.phone, data.firstName, data.lastName, data.email);
+            const result = await AuthController.registerClient(data.registrationToken, data.phone, data.firstName, data.lastName, data.email);
             reply.send({ status: "authorized", ...result });
+        }
+    );
+
+    fastify.post<{ Body: { login: string; password: string } }>(
+        "/vendor/signin",
+        {
+            schema: {
+                body: {
+                    type: "object",
+                    properties: {
+                        login: { type: "string" },
+                        password: { type: "string" },
+                    },
+                    required: ["login", "password"],
+                },
+            },
+        },
+        async (request, reply) => {
+            // const result = await AuthController.vendorSignIn(request.body.login, request.body.password);
+            // reply.send({ status: "authorized", ...result });
         }
     );
 
