@@ -1,11 +1,12 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { AppError, errorMessage } from "../utils/errors";
-import { UserService } from "./user.service";
+import { UsersService } from "./users.service";
 import { AuthData, Entity } from "../models/auth_data";
 import { Session, SessionModel } from "../models/session";
 import { User } from "../models/user";
 import { CompanyService } from "./company.service";
 import { VerificationService } from "./verification.service";
+import { NewUser } from "../dto/new_user";
 
 export class AuthService {
     static signAccessToken(authdata: AuthData): string {
@@ -42,7 +43,7 @@ export class AuthService {
 
     static async createAuthData(entity: Entity): Promise<AuthData> {
         if (entity.scope === "client") {
-            const user = await UserService.getUserById(entity.id);
+            const user = await UsersService.userById(entity.id);
             if (!user) throw new AppError("User not found", 404);
             const companies = await CompanyService.getCompaniesByMemberId(user.id);
             const companiesIds = companies.map((company) => company.id);
@@ -93,11 +94,11 @@ export class AuthService {
         let user: User | null = null;
 
         if (result.credentialType === "phone") {
-            user = await UserService.getUserByPhone(result.credential);
+            user = await UsersService.userByPhone(result.credential);
         }
 
         if (result.credentialType === "email") {
-            user = await UserService.getUserByEmail(result.credential);
+            user = await UsersService.userByEmail(result.credential);
         }
 
         if (!user) {
@@ -140,7 +141,14 @@ export class AuthService {
             if (email !== credential) throw new AppError("Invalid email", 400);
         }
 
-        const user = await UserService.createUser(firstName, lastName, phone, email, credentialType === "phone", credentialType === "email");
+        const user = await UsersService.createUser({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            phone: phone,
+            phoneVerified: credentialType === "phone",
+            emailVerified: credentialType === "email",
+        });
 
         const authData = await this.createAuthData({ id: user.id, scope: "client" });
         const session = await AuthService.createSession({ id: user.id, scope: "client" });

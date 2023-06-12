@@ -1,24 +1,25 @@
+import { NewUserContact } from "../dto/new_user_contact";
 import { AuthData } from "../models/auth_data";
 import { User } from "../models/user";
 import { UserContact } from "../models/user_contacts";
-import { UserService } from "../services/user.service";
+import { UsersService } from "../services/users.service";
 import { AppError } from "../utils/errors";
 
 export class UserController {
     static async me(authData: AuthData): Promise<User> {
         if (authData.scope !== "client") throw new AppError("Access denied, only for clients", 403);
-        const user = await UserService.getUserById(authData.entityId);
+        const user = await UsersService.userById(authData.entityId);
         if (!user) throw new AppError("User not found", 404);
         return user;
     }
 
-    static async userContacts(authData: AuthData): Promise<UserContact[]> {
+    static async contacts(authData: AuthData): Promise<UserContact[]> {
         if (authData.scope !== "client") throw new AppError("Access denied, only for clients", 403);
-        return UserService.userContacts(authData.entityId);
+        return UsersService.userContacts(authData.entityId);
     }
 
-    static async updateUserContacts(authData: AuthData, contacts: { firstName: string; lastName: string; phone: string }[]): Promise<UserContact[]> {
+    static async updateContacts(authData: AuthData, contacts: NewUserContact[]): Promise<UserContact[]> {
         if (authData.scope !== "client") throw new AppError("Access denied, only for clients", 403);
-        return UserService.updateUserContacts(authData.entityId, contacts);
+        return UsersService.updateUserContacts(authData.entityId, contacts);
     }
 }

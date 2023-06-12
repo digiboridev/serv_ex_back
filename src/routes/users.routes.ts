@@ -42,5 +42,26 @@ export const usersRoutes = (fastify: FastifyInstance, _: any, done: Function) =>
         }
     );
 
+    fastify.get<{ Params: { query: string } }>(
+        "/search/:query",
+        {
+            schema: {
+                params: {
+                    query: { type: "string", minLength: 3 },
+                },
+                response: {
+                    200: {
+                        type: "array",
+                        items: userSchema,
+                    },
+                },
+            },
+        },
+        async (request, reply) => {
+            const result = await UsersController.searchUsers(request.params.query);
+            reply.send(result);
+        }
+    );
+
     done();
 };

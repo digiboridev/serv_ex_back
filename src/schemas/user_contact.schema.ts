@@ -9,7 +9,7 @@ export const userContactSchema = {
     required: ["id", "firstName", "lastName", "phone"],
 };
 
-export const userContactCreateSchema = {
+export const newUserContactSchema = {
     type: "object",
     properties: {
         firstName: { type: "string" },
