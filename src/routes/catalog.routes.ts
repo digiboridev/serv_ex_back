@@ -20,7 +20,7 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CatalogController.getCategoryById(request.params.id);
+            const result = await CatalogController.categoryById(request.params.id);
             reply.send(result);
         }
     );
@@ -41,7 +41,7 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CatalogController.getCategories(request.params.id);
+            const result = await CatalogController.categories(request.params.id);
             reply.send(result);
         }
     );
@@ -62,7 +62,7 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CatalogController.getIssuesByCategory(request.params.id);
+            const result = await CatalogController.issuesByCategoryId(request.params.id);
             reply.send(result);
         }
     );
@@ -80,7 +80,7 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CatalogController.getCategories();
+            const result = await CatalogController.categories();
             reply.send(result);
         }
     );
@@ -98,7 +98,7 @@ export const catalogRoutes = (fastify: FastifyInstance, _: any, done: Function) 
             },
         },
         async (request, reply) => {
-            const result = await CatalogController.getIssue(request.params.id);
+            const result = await CatalogController.issueById(request.params.id);
             reply.send(result);
         }
     );

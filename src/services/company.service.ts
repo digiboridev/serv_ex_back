@@ -37,7 +37,6 @@ export class CompanyService {
             // Check if the user is a member of the company manually
             // because the user can be a member of the company but not have up to date auth payload
             const company = await this.getCompanyById(companyId);
-            if (!company) return new AppError("Company not found", 404);
             if (!company.membersIds.includes(authData.entityId)) return new AppError("Access denied, you are not a member of this company", 403);
         }
 

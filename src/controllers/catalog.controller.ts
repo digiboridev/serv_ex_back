@@ -8,29 +8,19 @@ export class CatalogController {
         return CatalogService.createCategory(name, imageUri, parentId);
     }
 
-    static async getCategoryById(id: string): Promise<Category> {
-        const cat = await CatalogService.getCategoryById(id);
-        if (!cat) throw new AppError("Category not found", 404);
-        return cat;
+    static async categoryById(id: string): Promise<Category> {
+        return CatalogService.categoryById(id);
     }
 
-    static async getCategoryByParentId(parentId: string): Promise<Category> {
-        const cat = await CatalogService.getCategoryByParentId(parentId);
-        if (!cat) throw new AppError("Category not found", 404);
-        return cat;
+    static async categories(parentId?: string): Promise<Category[]> {
+        return CatalogService.categories(parentId);
     }
 
-    static async getCategories(parentId?: string): Promise<Category[]> {
-        return CatalogService.getCategories(parentId);
+    static async issueById(id: string): Promise<Issue> {
+        return CatalogService.issueById(id);
     }
 
-    static async getIssue(id: string): Promise<Issue> {
-        const issue = await CatalogService.getIssue(id);
-        if (!issue) throw new AppError("Issue not found", 404);
-        return issue;
-    }
-
-    static async getIssuesByCategory(categoryId: string): Promise<Issue[]> {
-        return CatalogService.getIssuesByCategory(categoryId);
+    static async issuesByCategoryId(categoryId: string): Promise<Issue[]> {
+        return CatalogService.issuesByCategoryId(categoryId);
     }
 }
