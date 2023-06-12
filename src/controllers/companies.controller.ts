@@ -1,30 +1,28 @@
+import { NewCompany } from "../dto/new_company";
 import { AuthData } from "../models/auth_data";
 import { Company } from "../models/company";
 import { CompanyService } from "../services/company.service";
-import { ApiError } from "../utils/errors";
+import { AppError } from "../utils/errors";
 
 export class CompaniesController {
-    static async createCompany(name: string, email: string, publicId: string, membersIds: string[], authData: AuthData): Promise<Company> {
-        const companiesSet = new Set(membersIds);
+    static async createCompany(newCompany: NewCompany, authData: AuthData): Promise<Company> {
+        // Check if the user can create a company
+        const canCreateCompanyOrError = CompanyService.canCreateCompanyOrError(authData);
+        if (canCreateCompanyOrError !== true) throw canCreateCompanyOrError;
 
-        if (authData.scope === "client") {
-            companiesSet.add(authData.entityId);
-        }
+        // Add the clientid who created the company to the members list
+        if (authData.scope === "client" && !newCompany.membersIds.includes(authData.entityId))newCompany.membersIds.push(authData.entityId);
 
-        if (authData.scope === "vendor" && authData.entityRole !== "admin") {
-            throw new ApiError("Access denied, only for admins", 403);
-        }
-
-        return CompanyService.createCompany(name, email, publicId, Array.from(companiesSet));
+        return CompanyService.createCompany(newCompany);
     }
 
     static async updateMembers(companyId: string, membersIds: string[], authData: AuthData): Promise<Company | null> {
-        if (authData.scope === "client" && !authData.companiesIds.includes(companyId)) {
-            throw new ApiError("Access denied, you are not a member of this company", 403);
-        }
-        if (authData.scope === "vendor" && authData.entityRole !== "admin") {
-            throw new ApiError("Access denied, only for admins", 403);
-        }
+        if (membersIds.length === 0) throw new AppError("Members list cannot be empty", 400);
+
+        // Check if the user can edit the company
+        const canEditCompanyOrError = await CompanyService.canEditCompanyOrError(companyId, authData);
+        if (canEditCompanyOrError !== true) throw canEditCompanyOrError;
+
         return CompanyService.updateMembers(companyId, membersIds);
     }
 
@@ -33,7 +31,7 @@ export class CompaniesController {
     }
 
     static async getUserCompanies(authData: AuthData): Promise<Company[]> {
-        if (authData.scope !== "client") throw new ApiError("Access denied, only for clients", 403);
+        if (authData.scope !== "client") throw new AppError("Access denied, only for clients", 403);
         return CompanyService.getCompaniesByMemberId(authData.entityId);
     }
 }

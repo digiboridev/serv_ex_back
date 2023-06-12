@@ -2,6 +2,7 @@ import { FastifyInstance } from "fastify";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { CompaniesController } from "../controllers/companies.controller";
 import { companyCreateSchema, companySchema } from "../schemas/company.schema";
+import { NewCompany } from "../dto/new_company";
 
 export const companiesRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
@@ -24,7 +25,7 @@ export const companiesRoutes = (fastify: FastifyInstance, _: any, done: Function
         }
     );
 
-    fastify.post<{ Body: { name: string; email: string; publicId: string; membersIds: string[] } }>(
+    fastify.post<{ Body: NewCompany }>(
         "/create-company",
         {
             schema: {
@@ -35,13 +36,7 @@ export const companiesRoutes = (fastify: FastifyInstance, _: any, done: Function
             },
         },
         async (request, reply) => {
-            const result = await CompaniesController.createCompany(
-                request.body.name,
-                request.body.email,
-                request.body.publicId,
-                request.body.membersIds,
-                request.authData
-            );
+            const result = await CompaniesController.createCompany(request.body, request.authData);
             reply.send(result);
         }
     );

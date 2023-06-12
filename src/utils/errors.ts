@@ -3,7 +3,7 @@ export function errorMessage(error: unknown) {
     return String(error)
 }
 
-export class ApiError extends Error {
+export class AppError extends Error {
     constructor(message: string, public code: number) {
         super(message)
     }

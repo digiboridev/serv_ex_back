@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { AuthController } from "../controllers/auth.controller";
-import { ApiError, errorMessage } from "../utils/errors";
+import { AppError, errorMessage } from "../utils/errors";
 
 export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.post<{ Body: { grant_type: string; refresh_token: string } }>(

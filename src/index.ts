@@ -7,7 +7,7 @@ import { companiesRoutes } from "./routes/companies.routes";
 import { usersRoutes } from "./routes/users.routes";
 import { catalogRoutes } from "./routes/catalog.routes";
 import { ordersRoutes } from "./routes/orders.routes";
-import { ApiError, errorMessage } from "./utils/errors";
+import { AppError, errorMessage } from "./utils/errors";
 
 const fastify = Fastify({ logger: true });
 
@@ -21,7 +21,7 @@ fastify.register(ordersRoutes, { prefix: "/orders" });
 
 fastify.addHook("onError", async (request, reply, error) => {
     console.error(error);
-    if (error instanceof ApiError) {
+    if (error instanceof AppError) {
         reply.status(error.code).send({ error: error.message });
     } else {
         reply.status(500).send({ error: errorMessage(error) });
@@ -48,3 +48,4 @@ fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
 
 
 })();
+

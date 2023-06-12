@@ -1,5 +1,5 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken";
-import { ApiError, errorMessage } from "../utils/errors";
+import { AppError, errorMessage } from "../utils/errors";
 import { UserService } from "./user.service";
 import { AuthData, Entity } from "../models/auth_data";
 import { Session, SessionModel } from "../models/session";
@@ -43,17 +43,17 @@ export class AuthService {
     static async createAuthData(entity: Entity): Promise<AuthData> {
         if (entity.scope === "client") {
             const user = await UserService.getUserById(entity.id);
-            if (!user) throw new ApiError("User not found", 404);
+            if (!user) throw new AppError("User not found", 404);
             const companies = await CompanyService.getCompaniesByMemberId(user.id);
             const companiesIds = companies.map((company) => company.id);
             return { scope: "client", entityId: user.id, companiesIds };
         }
 
         if (entity.scope === "vendor") {
-            throw new ApiError("not implemented", 501);
+            throw new AppError("not implemented", 501);
         }
 
-        throw new ApiError("Invalid scope", 400);
+        throw new AppError("Invalid scope", 400);
     }
 
     static async refreshToken(refreshToken: string): Promise<{ authData: AuthData; refreshToken: string; accessToken: string }> {
@@ -63,13 +63,13 @@ export class AuthService {
             const payload = verify(refreshToken, "refresh_token_secret");
             sessionId = (payload as JwtPayload).sessionId;
         } catch (error) {
-            throw new ApiError(errorMessage(error), 400);
+            throw new AppError(errorMessage(error), 400);
         }
 
-        if (!sessionId) throw new ApiError("Invalid refresh token", 400);
+        if (!sessionId) throw new AppError("Invalid refresh token", 400);
 
         const session = await AuthService.getSessionById(sessionId);
-        if (!session) throw new ApiError("Session expired", 403);
+        if (!session) throw new AppError("Session expired", 403);
 
         const authData = await this.createAuthData({ id: session.entityId, scope: session.scope });
         const newRefreshToken = AuthService.signRefreshToken(session.id);
@@ -88,7 +88,7 @@ export class AuthService {
         code: string
     ): Promise<{ authData: AuthData; refreshToken: string; accessToken: string } | { registrationToken: string }> {
         const result = await VerificationService.verifyCode(token, code);
-        if (!result) throw new ApiError("Invalid code", 400);
+        if (!result) throw new AppError("Invalid code", 400);
 
         let user: User | null = null;
 
@@ -128,16 +128,16 @@ export class AuthService {
             credential = payload.credential;
             credentialType = payload.credentialType;
         } catch (error) {
-            throw new ApiError(errorMessage(error), 400);
+            throw new AppError(errorMessage(error), 400);
         }
 
-        if (!credential || !credentialType) throw new ApiError("Invalid registration token", 400);
+        if (!credential || !credentialType) throw new AppError("Invalid registration token", 400);
 
         if (credentialType === "phone") {
-            if (phone !== credential) throw new ApiError("Invalid phone", 400);
+            if (phone !== credential) throw new AppError("Invalid phone", 400);
         }
         if (credentialType === "email") {
-            if (email !== credential) throw new ApiError("Invalid email", 400);
+            if (email !== credential) throw new AppError("Invalid email", 400);
         }
 
         const user = await UserService.createUser(firstName, lastName, phone, email, credentialType === "phone", credentialType === "email");
