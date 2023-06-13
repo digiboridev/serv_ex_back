@@ -6,7 +6,6 @@ import { Session, SessionModel } from "../models/session";
 import { User } from "../models/user";
 import { CompanyService } from "./company.service";
 import { VerificationService } from "./verification.service";
-import { NewUser } from "../dto/new_user";
 
 export class AuthService {
     static signAccessToken(authdata: AuthData): string {
@@ -42,12 +41,12 @@ export class AuthService {
     }
 
     static async createAuthData(entity: Entity): Promise<AuthData> {
-        if (entity.scope === "client") {
+        if (entity.scope === "customer") {
             const user = await UsersService.userById(entity.id);
             if (!user) throw new AppError("User not found", 404);
             const companies = await CompanyService.getCompaniesByMemberId(user.id);
             const companiesIds = companies.map((company) => company.id);
-            return { scope: "client", entityId: user.id, companiesIds };
+            return { scope: "customer", entityId: user.id, companiesIds };
         }
 
         if (entity.scope === "vendor") {
@@ -105,8 +104,8 @@ export class AuthService {
             const registrationToken = this.signRegistrationToken(result.credential, result.credentialType);
             return { registrationToken };
         } else {
-            const authData = await this.createAuthData({ id: user.id, scope: "client" });
-            const session = await AuthService.createSession({ id: user.id, scope: "client" });
+            const authData = await this.createAuthData({ id: user.id, scope: "customer" });
+            const session = await AuthService.createSession({ id: user.id, scope: "customer" });
             const refreshToken = AuthService.signRefreshToken(session.id);
             const accessToken = AuthService.signAccessToken(authData);
             return { authData: authData, refreshToken: refreshToken, accessToken: accessToken };
@@ -150,8 +149,8 @@ export class AuthService {
             emailVerified: credentialType === "email",
         });
 
-        const authData = await this.createAuthData({ id: user.id, scope: "client" });
-        const session = await AuthService.createSession({ id: user.id, scope: "client" });
+        const authData = await this.createAuthData({ id: user.id, scope: "customer" });
+        const session = await AuthService.createSession({ id: user.id, scope: "customer" });
         const refreshToken = AuthService.signRefreshToken(session.id);
         const accessToken = AuthService.signAccessToken(authData);
         return { authData: authData, refreshToken: refreshToken, accessToken: accessToken };

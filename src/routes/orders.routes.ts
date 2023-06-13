@@ -8,28 +8,39 @@ import { CustomerInfo } from "../models/order/customer_info";
 export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
 
-    fastify.get<{ Querystring: CustomerInfo }>(
-        "/customer-orders",
+    fastify.get<{ Querystring?: CustomerInfo }>(
+        "/",
         {
             schema: {
                 querystring: {
-                    type: "object",
-                    properties: {
-                        customerType: { type: "string", enum: ["personal", "company"] },
-                        customerId: { type: "string" },
-                    },
-                    required: ["customerType", "customerId"],
+                    oneOf: [
+                        {
+                            type: "object",
+                            properties: {
+                                customerId: { type: "null" },
+                                customerType: { type: "null" },
+                            },
+                        },
+                        {
+                            type: "object",
+                            properties: {
+                                customerType: { type: "string", enum: ["personal", "company"] },
+                                customerId: { type: "string" },
+                            },
+                            required: ["customerType", "customerId"],
+                        },
+                    ],
                 },
             },
         },
         async (request, reply) => {
-            const orders = await OrderController.getCustomerOrders(request.authData, request.query);
+            const orders = await OrderController.orders(request.authData, request.query);
             reply.send(orders);
         }
     );
 
     fastify.get<{ Params: { orderId: string } }>(
-        "/customer-orders/:orderId",
+        "/:orderId",
         {
             schema: {
                 params: {
@@ -42,20 +53,20 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
             },
         },
         async (request, reply) => {
-            const order = await OrderController.getCustomerOrderById(request.authData, request.params.orderId);
+            const order = await OrderController.orderById(request.authData, request.params.orderId);
             reply.send(order);
         }
     );
 
     fastify.post<{ Body: NewOrder }>(
-        "/customer-orders",
+        "/",
         {
             schema: {
                 body: newOrderSchema,
             },
         },
         async (request, reply) => {
-            const order = await OrderController.createCustomerOrder(request.authData, request.body);
+            const order = await OrderController.createOrder(request.authData, request.body);
             reply.send(order);
         }
     );

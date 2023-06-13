@@ -1,5 +1,5 @@
 import { NewCompany } from "../dto/new_company";
-import { AuthData } from "../models/auth_data";
+import { AuthData, ClientAuthData } from "../models/auth_data";
 import { Company, CompanyModel } from "../models/company";
 import { AppError } from "../utils/errors";
 
@@ -32,17 +32,15 @@ export class CompanyService {
 
     /** Check if the user can edit a company by checking the scope and role */
     static async canEditCompanyOrError(companyId: string, authData: AuthData): Promise<true | AppError> {
-        // Check if the client user is a member of the company
-        if (authData.scope === "client" && !authData.companiesIds.includes(companyId)) {
-            // Check if the user is a member of the company manually
-            // because the user can be a member of the company but not have up to date auth payload
-            const company = await this.getCompanyById(companyId);
-            if (!company.membersIds.includes(authData.entityId)) return new AppError("Access denied, you are not a member of this company", 403);
+        // Check if the client able to edit the company
+        if (authData.scope === "customer") {
+            const isMember = await this.isCompanyMember(companyId, authData);
+            if (!isMember) return new AppError("Access denied, you are not a member of this company", 403);
         }
 
-        // Check if the vendor user is an admin
-        if (authData.scope === "vendor" && authData.entityRole !== "admin") {
-            return new AppError("Access denied, only for admins", 403);
+        // Check if the vendor able to edit the company
+        if (authData.scope === "vendor") {
+            if (authData.entityRole !== "admin") return new AppError("Access denied, only for admins", 403);
         }
 
         return true;
@@ -56,5 +54,18 @@ export class CompanyService {
         }
 
         return true;
+    }
+
+    /** Check if the user is a member of a company */
+    static async isCompanyMember(companyId: string, authData: ClientAuthData): Promise<boolean> {
+        // Check if the client user is a member of the company from the auth payload
+        if (authData.companiesIds.includes(companyId)) return true;
+
+        // Check if the user is a member of the company manually
+        // because the user can be a member of the company but not have up to date auth payload
+        const company = await this.getCompanyById(companyId);
+        if (company.membersIds.includes(authData.entityId)) return true;
+
+        return false;
     }
 }

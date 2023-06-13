@@ -4,9 +4,6 @@ import { AuthData } from "../models/auth_data";
 import { AuthService } from "../services/auth.service";
 
 
-
-
-
 declare module "fastify" {
     interface FastifyRequest {
         authData: AuthData;

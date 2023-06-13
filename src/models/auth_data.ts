@@ -1,10 +1,10 @@
 export type Entity = {
     id: string;
-    scope: "client" | "vendor";
+    scope: "customer" | "vendor";
 };
 
 export type ClientAuthData = {
-    scope: "client";
+    scope: "customer";
     entityId: string;
     companiesIds: string[];
 };

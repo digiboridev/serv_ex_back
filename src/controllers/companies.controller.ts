@@ -11,7 +11,7 @@ export class CompaniesController {
         if (canCreateCompanyOrError !== true) throw canCreateCompanyOrError;
 
         // Add the clientid who created the company to the members list
-        if (authData.scope === "client" && !newCompany.membersIds.includes(authData.entityId))newCompany.membersIds.push(authData.entityId);
+        if (authData.scope === "customer" && !newCompany.membersIds.includes(authData.entityId))newCompany.membersIds.push(authData.entityId);
 
         return CompanyService.createCompany(newCompany);
     }
@@ -31,7 +31,7 @@ export class CompaniesController {
     }
 
     static async getUserCompanies(authData: AuthData): Promise<Company[]> {
-        if (authData.scope !== "client") throw new AppError("Access denied, only for clients", 403);
+        if (authData.scope !== "customer") throw new AppError("Access denied, only for clients", 403);
         return CompanyService.getCompaniesByMemberId(authData.entityId);
     }
 }

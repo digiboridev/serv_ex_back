@@ -1,6 +1,9 @@
 import { NewOrder } from "../dto/new_order";
+import { AuthData } from "../models/auth_data";
 import { CustomerInfo } from "../models/order/customer_info";
 import { Order, OrderModel } from "../models/order/order";
+import { AppError } from "../utils/errors";
+import { CompanyService } from "./company.service";
 
 export class OrderService {
     static async createOrder(order: NewOrder): Promise<Order> {
@@ -21,13 +24,55 @@ export class OrderService {
         return newOrder.toObject();
     }
 
-    static async getCustomerOrders(customerId: string): Promise<Order[]> {
-        const orders = await OrderModel.find({ "customerInfo.customerId": customerId });
+    /**
+     * Get orders for specific customer or for all customers if customerId is not provided
+     * @param customerId - optional customer id to get orders for specific customer
+     * @returns Orders list
+     */
+    static async orders(customerId?: string): Promise<Order[]> {
+        const query = customerId ? { "customerInfo.customerId": customerId } : {};
+        const orders = await OrderModel.find(query).sort({ createdAt: -1 });
         return orders.map((order) => order.toObject());
     }
 
-    static async getOrderById(orderId: string): Promise<Order | null> {
+    /** Get order by id */
+    static async orderById(orderId: string): Promise<Order> {
         const order = await OrderModel.findById(orderId);
-        return order?.toObject() ?? null;
+        if (!order) throw new AppError("Order not found", 404);
+        return order.toObject();
+    }
+
+    // Check if user can get order
+    static async canGetOrder(order: Order, authData: AuthData): Promise<boolean> {
+        return await OrderService.hasAccessToResource(authData, order.customerInfo);
+    }
+
+    // Check if user can create order
+    static async canCreateOrder(order: NewOrder, authData: AuthData): Promise<boolean> {
+        return await OrderService.hasAccessToResource(authData, order.customerInfo);
+    }
+
+    /**
+     * Check if user has access to order
+     * @param customerInfo - customer info of resource[order or query of orders] to check
+     * @param authData - auth data of user who performs action
+     * @returns  - true if user has access to order, false otherwise
+     */
+    static async hasAccessToResource(authData: AuthData, customerInfo: CustomerInfo): Promise<boolean> {
+        if (authData.scope === "vendor") return true;
+
+        if (authData.scope === "customer") {
+            if (customerInfo.customerType === "personal") {
+                const isOwner = customerInfo.customerId === authData.entityId;
+                if (isOwner) return true;
+            }
+
+            if (customerInfo.customerType === "company") {
+                const isMember = await CompanyService.isCompanyMember(customerInfo.customerId, authData);
+                if (isMember) return true;
+            }
+        }
+
+        return false;
     }
 }

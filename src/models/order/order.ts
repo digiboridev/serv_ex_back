@@ -18,7 +18,7 @@ export enum PaymentStatus {
 }
 
 export enum DeviceLocation {
-    client = "client",
+    client = "customer",
     laboratory = "laboratory",
 }
 
@@ -37,8 +37,8 @@ const OrderSchema = new Schema(
         },
         deviceLocation: {
             type: String,
-            enum: ["client", "laboratory"],
-            default: "client",
+            enum: ["customer", "laboratory"],
+            default: "customer",
         },
     },
     {

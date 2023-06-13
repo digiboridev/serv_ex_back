@@ -3,7 +3,7 @@ import { Schema, model } from "mongoose";
 export type Session = {
     id: string;
     entityId: string;
-    scope: "client" | "vendor";
+    scope: "customer" | "vendor";
     createdAt: Date;
     updatedAt: Date;
 };
@@ -11,7 +11,7 @@ export type Session = {
 const SessionSchema = new Schema(
     {
         entityId: { type: String, required: true },
-        scope: { type: String, enum: ["client", "vendor"], required: true },
+        scope: { type: String, enum: ["customer", "vendor"], required: true },
         ttl: {
             type: Date,
             default: () => {
