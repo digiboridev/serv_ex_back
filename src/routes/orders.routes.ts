@@ -4,6 +4,8 @@ import { NewOrder } from "../dto/new_order";
 import { newOrderSchema } from "../schemas/new_order.schema";
 import { OrderController } from "../controllers/orders.controller";
 import { CustomerInfo } from "../models/order/customer_info";
+import { CancellOrderDto } from "../dto/cancell_order";
+import { CancellationReasons } from "../models/order/status_details/cancelled";
 
 export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
@@ -39,6 +41,19 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
         }
     );
 
+    fastify.post<{ Body: NewOrder }>(
+        "/",
+        {
+            schema: {
+                body: newOrderSchema,
+            },
+        },
+        async (request, reply) => {
+            const order = await OrderController.createOrder(request.authData, request.body);
+            reply.send(order);
+        }
+    );
+
     fastify.get<{ Params: { orderId: string } }>(
         "/:orderId",
         {
@@ -58,15 +73,33 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
         }
     );
 
-    fastify.post<{ Body: NewOrder }>(
-        "/",
+    fastify.post<{ Params: { orderId: string }; Body: CancellOrderDto }>(
+        "/:orderId/cancell",
         {
             schema: {
-                body: newOrderSchema,
+                params: {
+                    type: "object",
+                    properties: {
+                        orderId: { type: "string" },
+                    },
+                    required: ["orderId"],
+                },
+                body: {
+                    type: "object",
+                    properties: {
+                        reason: { type: "string", enum: Object.values(CancellationReasons) },
+                        description: { type: "string" },
+                    },
+                    required: ["reason", "description"],
+                },
             },
         },
         async (request, reply) => {
-            const order = await OrderController.createOrder(request.authData, request.body);
+            const order = await OrderController.cancelOrder(request.authData, {
+                orderId: request.params.orderId,
+                reason: request.body.reason,
+                description: request.body.description,
+            });
             reply.send(order);
         }
     );

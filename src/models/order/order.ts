@@ -18,7 +18,7 @@ export enum PaymentStatus {
 }
 
 export enum DeviceLocation {
-    client = "customer",
+    customer = "customer",
     laboratory = "laboratory",
 }
 
@@ -54,4 +54,4 @@ const OrderSchema = new Schema(
     }
 );
 
-export const OrderModel = model("Order", OrderSchema);
+export const OrderModel = model<Order>("Order", OrderSchema);
