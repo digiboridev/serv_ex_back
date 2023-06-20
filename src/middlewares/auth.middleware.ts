@@ -16,13 +16,12 @@ export const authMiddleware = async (request: FastifyRequest, reply: FastifyRepl
         reply.status(401).send("No token provided");
         console.log("auth middleware:", "no token provided");
         return;
-
     }
 
     try {
         const authData = AuthService.verifyAccessToken(token);
         request.authData = authData;
-        console.log("auth middleware:", "token verified", authData);
+        // console.log("auth middleware:", "token verified", authData);
     } catch (error) {
         reply.status(401).send(errorMessage(error));
         console.log("auth middleware:", error);

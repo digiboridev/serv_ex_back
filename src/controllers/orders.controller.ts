@@ -4,7 +4,7 @@ import { AuthData } from "../models/auth_data";
 import { CustomerInfo } from "../models/order/customer_info";
 import { Order } from "../models/order/order";
 import { CancellationReasons } from "../models/order/status_details/cancelled";
-import { OrderService } from "../services/order.service";
+import { OrderService, ordersUpdateService } from "../services/order.service";
 import { AppError } from "../utils/errors";
 
 export class OrderController {
@@ -24,6 +24,15 @@ export class OrderController {
             return await OrderService.orders();
         }
     }
+
+    static async customerOrdersUpdates(authData: AuthData, customerInfo: CustomerInfo) {
+        // Check if user has access to that resource
+        const hasAccess = await OrderService.hasAccessToResource(authData, customerInfo);
+        if (!hasAccess) throw new AppError("Permission denied", 403);
+
+        return ordersUpdateService.watchCustomerOrderChangesIterator(customerInfo.customerId);
+    }
+
 
     static async orderById(authData: AuthData, orderId: string): Promise<Order> {
         const order = await OrderService.orderById(orderId);

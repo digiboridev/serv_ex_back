@@ -1,3 +1,4 @@
+import { EventEmitter } from "ws";
 import { CancellOrderDto } from "../dto/cancell_order";
 import { NewOrder } from "../dto/new_order";
 import { AuthData, Entity } from "../models/auth_data";
@@ -7,6 +8,8 @@ import { OrderStatusType } from "../models/order/order_status";
 import { CancellationReasons, OrderCancellDetails } from "../models/order/status_details/cancelled";
 import { AppError } from "../utils/errors";
 import { CompanyService } from "./company.service";
+import { on } from "events";
+import { Channel, WrappedBalancer } from "queueable";
 
 export class OrderService {
     /**
@@ -29,6 +32,7 @@ export class OrderService {
                 password: order.password,
             },
         });
+        ordersUpdateService.orderChanged(newOrder.toObject());
         return newOrder.toObject();
     }
 
@@ -36,6 +40,11 @@ export class OrderService {
     static async orders(customerId?: string): Promise<Order[]> {
         const query = customerId ? { "customerInfo.customerId": customerId } : {};
         const orders = await OrderModel.find(query).sort({ createdAt: -1 });
+
+        //watch query
+
+        const ee = OrderModel.watch([{ $match: { "fullDocument.customerInfo.customerId": customerId } }]);
+
         return orders.map((order) => order.toObject());
     }
 
@@ -69,6 +78,7 @@ export class OrderService {
                 actor: "customer",
             };
             await order.save();
+            ordersUpdateService.orderChanged(order.toObject());
             return order.toObject();
         } else {
             order.status.currentStatus = OrderStatusType.canceled;
@@ -79,6 +89,7 @@ export class OrderService {
                 employeeId: authData.entityId,
             };
             await order.save();
+            ordersUpdateService.orderChanged(order.toObject());
             return order.toObject();
         }
     }
@@ -116,4 +127,60 @@ export class OrderService {
 
         return false;
     }
+
+    static async listenToOrderChanges(orderId: string) {
+        // const listener = ordersUpdateService.watchCustomerOrderChangesCallBack(orderId, (order) => {
+        //     console.log(order);
+        // });
+        // listener.dispose();
+        // for await (const order of ordersUpdateService.watchCustomerOrderChangesIterator(orderId)) {
+        //     console.log(order);
+        // }
+    }
 }
+
+export class OrdersUpdateService extends EventEmitter {
+    orderChanged(order: Order) {
+        this.emit("order_changed", order);
+    }
+
+    watchCustomerOrderChangesCallBack(customerId: string, listener: (order: Order) => void): { dispose: () => void } {
+        const localListener = (order: Order) => {
+            if (order.customerInfo.customerId == customerId) listener(order);
+        };
+
+        this.on("order_changed", localListener);
+
+        return {
+            dispose: () => {
+                this.off("order_changed", localListener);
+            },
+        };
+    }
+
+    watchCustomerOrderChangesGenerator(customerId: string) {
+        const ee = this;
+        return (async function* () {
+            for await (const [event] of on(ee, "order_changed")) {
+                if ((event as Order).customerInfo.customerId == customerId) yield event as Order;
+            }
+        })();
+    }
+
+    watchCustomerOrderChangesIterator(customerId: string): WrappedBalancer<Order> {
+        const channel = new Channel<Order>();
+
+        const localListener = (order: Order) => {
+            console.log("local listener");
+            if (order.customerInfo.customerId == customerId) channel.push(order);
+        };
+
+        this.on("order_changed", localListener);
+
+        const iterable = channel.wrap(() => {
+            this.off("order_changed", localListener);
+        });
+        return iterable;
+    }
+}
+export const ordersUpdateService = new OrdersUpdateService();

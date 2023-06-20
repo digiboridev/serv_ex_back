@@ -10,6 +10,7 @@ export const userRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
 
     fastify.get(
         "/me",
+
         {
             schema: {
                 response: {
@@ -20,6 +21,22 @@ export const userRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
         async (request, reply) => {
             const result = await UserController.me(request.authData);
             reply.send(result);
+        }
+    );
+    fastify.get(
+        "/meTest",
+
+        {
+            websocket: true,
+        },
+        async (con, request) => {
+            // const result = await UserController.me(request.authData);
+            // reply.send(result);
+            con.socket.send("hello new");
+            con.socket.on("message", (message) => {
+                console.log(message);
+                con.socket.send("hello");
+            });
         }
     );
 

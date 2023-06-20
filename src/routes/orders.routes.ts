@@ -41,6 +41,54 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
         }
     );
 
+    fastify.get<{ Querystring: CustomerInfo }>(
+        "/customer_orders_updates_lp",
+        {
+            schema: {
+                querystring: {
+                    type: "object",
+                    properties: {
+                        customerType: { type: "string", enum: ["personal", "company"] },
+                        customerId: { type: "string" },
+                    },
+                    required: ["customerType", "customerId"],
+                },
+            },
+        },
+        async (request, reply) => {
+            const ordersIterator = await OrderController.customerOrdersUpdates(request.authData, request.query);
+            const a = await ordersIterator.next();
+            ordersIterator.return();
+            reply.send(a.value);
+        }
+    );
+    fastify.get<{ Querystring: CustomerInfo }>(
+        "/customer_orders_updates_sse",
+        {
+            schema: {
+                querystring: {
+                    type: "object",
+                    properties: {
+                        customerType: { type: "string", enum: ["personal", "company"] },
+                        customerId: { type: "string" },
+                    },
+                    required: ["customerType", "customerId"],
+                },
+            },
+        },
+        async (request, reply) => {
+            const ordersIterator = await OrderController.customerOrdersUpdates(request.authData, request.query);
+
+            request.socket.on("close", () => ordersIterator.return());
+            reply.sse({ event: "connected" });
+
+            for await (const order of ordersIterator) {
+                console.log("sse: update");
+                reply.sse({ event: "update", data: JSON.stringify(order) });
+            }
+        }
+    );
+
     fastify.post<{ Body: NewOrder }>(
         "/",
         {
