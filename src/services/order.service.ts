@@ -32,7 +32,7 @@ export class OrderService {
                 password: order.password,
             },
         });
-        ordersUpdateService.orderChanged(newOrder.toObject());
+        ordersUpdateService.orderUpdate(newOrder.toObject());
         return newOrder.toObject();
     }
 
@@ -78,7 +78,7 @@ export class OrderService {
                 actor: "customer",
             };
             await order.save();
-            ordersUpdateService.orderChanged(order.toObject());
+            ordersUpdateService.orderUpdate(order.toObject());
             return order.toObject();
         } else {
             order.status.currentStatus = OrderStatusType.canceled;
@@ -89,7 +89,7 @@ export class OrderService {
                 employeeId: authData.entityId,
             };
             await order.save();
-            ordersUpdateService.orderChanged(order.toObject());
+            ordersUpdateService.orderUpdate(order.toObject());
             return order.toObject();
         }
     }
@@ -128,58 +128,47 @@ export class OrderService {
         return false;
     }
 
-    static async listenToOrderChanges(orderId: string) {
-        // const listener = ordersUpdateService.watchCustomerOrderChangesCallBack(orderId, (order) => {
-        //     console.log(order);
-        // });
-        // listener.dispose();
-        // for await (const order of ordersUpdateService.watchCustomerOrderChangesIterator(orderId)) {
-        //     console.log(order);
-        // }
+    static async watchOrdersUpdates(customerId?: string) {
+        return ordersUpdateService.watchOrdersUpdates(customerId);
+    }
+
+    static async watchOrderUpdates(orderId: string) {
+        return ordersUpdateService.watchOrderUpdates(orderId);
     }
 }
 
-export class OrdersUpdateService extends EventEmitter {
-    orderChanged(order: Order) {
-        this.emit("order_changed", order);
+ class OrdersUpdateService extends EventEmitter {
+    orderUpdate(order: Order) {
+        this.emit("_", order);
     }
 
-    watchCustomerOrderChangesCallBack(customerId: string, listener: (order: Order) => void): { dispose: () => void } {
-        const localListener = (order: Order) => {
-            if (order.customerInfo.customerId == customerId) listener(order);
-        };
-
-        this.on("order_changed", localListener);
-
-        return {
-            dispose: () => {
-                this.off("order_changed", localListener);
-            },
-        };
-    }
-
-    watchCustomerOrderChangesGenerator(customerId: string) {
-        const ee = this;
-        return (async function* () {
-            for await (const [event] of on(ee, "order_changed")) {
-                if ((event as Order).customerInfo.customerId == customerId) yield event as Order;
-            }
-        })();
-    }
-
-    watchCustomerOrderChangesIterator(customerId: string): WrappedBalancer<Order> {
+    watchOrdersUpdates(customerId?: string): WrappedBalancer<Order> {
         const channel = new Channel<Order>();
 
         const localListener = (order: Order) => {
-            console.log("local listener");
-            if (order.customerInfo.customerId == customerId) channel.push(order);
+            if (customerId) {
+                if (order.customerInfo.customerId == customerId) channel.push(order);
+            } else {
+                channel.push(order);
+            }
         };
 
-        this.on("order_changed", localListener);
+        this.on("_", localListener);
 
-        const iterable = channel.wrap(() => {
-            this.off("order_changed", localListener);
-        });
+        const iterable = channel.wrap(() => this.off("_", localListener));
+        return iterable;
+    }
+
+    watchOrderUpdates(orderId: string): WrappedBalancer<Order> {
+        const channel = new Channel<Order>();
+
+        const localListener = (order: Order) => {
+            if (order.id == orderId) channel.push(order);
+        };
+
+        this.on("_", localListener);
+
+        const iterable = channel.wrap(() => this.off("_", localListener));
         return iterable;
     }
 }

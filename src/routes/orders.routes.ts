@@ -6,6 +6,9 @@ import { OrderController } from "../controllers/orders.controller";
 import { CustomerInfo } from "../models/order/customer_info";
 import { CancellOrderDto } from "../dto/cancell_order";
 import { CancellationReasons } from "../models/order/status_details/cancelled";
+import { customerInfoSchema } from "../schemas/customer_info.schema";
+
+
 
 export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) => {
     fastify.addHook("preHandler", authMiddleware);
@@ -14,25 +17,7 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
         "/",
         {
             schema: {
-                querystring: {
-                    oneOf: [
-                        {
-                            type: "object",
-                            properties: {
-                                customerId: { type: "null" },
-                                customerType: { type: "null" },
-                            },
-                        },
-                        {
-                            type: "object",
-                            properties: {
-                                customerType: { type: "string", enum: ["personal", "company"] },
-                                customerId: { type: "string" },
-                            },
-                            required: ["customerType", "customerId"],
-                        },
-                    ],
-                },
+                querystring: customerInfoSchema,
             },
         },
         async (request, reply) => {
@@ -41,49 +26,34 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
         }
     );
 
-    fastify.get<{ Querystring: CustomerInfo }>(
-        "/customer_orders_updates_lp",
+    fastify.get<{ Querystring?: CustomerInfo }>(
+        "/updates_lp",
         {
             schema: {
-                querystring: {
-                    type: "object",
-                    properties: {
-                        customerType: { type: "string", enum: ["personal", "company"] },
-                        customerId: { type: "string" },
-                    },
-                    required: ["customerType", "customerId"],
-                },
+                querystring: customerInfoSchema,
             },
         },
         async (request, reply) => {
-            const ordersIterator = await OrderController.customerOrdersUpdates(request.authData, request.query);
-            const a = await ordersIterator.next();
+            const ordersIterator = await OrderController.ordersUpdates(request.authData, request.query);
+            const update = await ordersIterator.next();
             ordersIterator.return();
-            reply.send(a.value);
+            reply.send(update.value);
         }
     );
-    fastify.get<{ Querystring: CustomerInfo }>(
-        "/customer_orders_updates_sse",
+    fastify.get<{ Querystring?: CustomerInfo }>(
+        "/updates_sse",
         {
             schema: {
-                querystring: {
-                    type: "object",
-                    properties: {
-                        customerType: { type: "string", enum: ["personal", "company"] },
-                        customerId: { type: "string" },
-                    },
-                    required: ["customerType", "customerId"],
-                },
+                querystring: customerInfoSchema,
             },
         },
         async (request, reply) => {
-            const ordersIterator = await OrderController.customerOrdersUpdates(request.authData, request.query);
+            const ordersIterator = await OrderController.ordersUpdates(request.authData, request.query);
 
             request.socket.on("close", () => ordersIterator.return());
             reply.sse({ event: "connected" });
 
             for await (const order of ordersIterator) {
-                console.log("sse: update");
                 reply.sse({ event: "update", data: JSON.stringify(order) });
             }
         }
@@ -116,8 +86,54 @@ export const ordersRoutes = (fastify: FastifyInstance, _: any, done: Function) =
             },
         },
         async (request, reply) => {
-            const order = await OrderController.orderById(request.authData, request.params.orderId);
+            const order = await OrderController.order(request.authData, request.params.orderId);
             reply.send(order);
+        }
+    );
+
+    fastify.get<{ Params: { orderId: string } }>(
+        "/:orderId/updates_lp",
+        {
+            schema: {
+                params: {
+                    type: "object",
+                    properties: {
+                        orderId: { type: "string" },
+                    },
+                    required: ["orderId"],
+                },
+            },
+        },
+        async (request, reply) => {
+            const orderIterator = await OrderController.orderUpdates(request.authData, request.params.orderId);
+            const update = await orderIterator.next();
+            orderIterator.return();
+            reply.send(update.value);
+        }
+    );
+
+    fastify.get<{ Params: { orderId: string } }>(
+        "/:orderId/updates_sse",
+        {
+            schema: {
+                params: {
+                    type: "object",
+                    properties: {
+                        orderId: { type: "string" },
+                    },
+                    required: ["orderId"],
+                },
+            },
+        },
+        async (request, reply) => {
+            const orderIterator = await OrderController.orderUpdates(request.authData, request.params.orderId);
+            
+            request.socket.on("close", () => orderIterator.return());
+            reply.sse({ event: "connected" });
+
+            for await (const order of orderIterator) {
+                reply.sse({ event: "update", data: JSON.stringify(order) });
+            }
         }
     );
 
