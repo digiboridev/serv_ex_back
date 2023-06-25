@@ -3,8 +3,7 @@ import { NewOrder } from "../dto/new_order";
 import { AuthData } from "../models/auth_data";
 import { CustomerInfo } from "../models/order/customer_info";
 import { Order } from "../models/order/order";
-import { CancellationReasons } from "../models/order/status_details/cancelled";
-import { OrderService, ordersUpdateService } from "../services/order.service";
+import { OrderService } from "../services/order.service";
 import { AppError } from "../utils/errors";
 
 export class OrderController {
@@ -55,7 +54,7 @@ export class OrderController {
         const canGetOrder = await OrderService.canGetOrder(order, authData);
         if (!canGetOrder) throw new AppError("Permission denied", 403);
 
-        return ordersUpdateService.watchOrderUpdates(orderId);
+        return OrderService.watchOrderUpdates(orderId);
     }
 
     static async createOrder(authData: AuthData, order: NewOrder): Promise<Order> {

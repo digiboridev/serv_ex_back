@@ -1,15 +1,12 @@
-import { EventEmitter } from "ws";
 import { CancellOrderDto } from "../dto/cancell_order";
 import { NewOrder } from "../dto/new_order";
-import { AuthData, Entity } from "../models/auth_data";
+import { AuthData } from "../models/auth_data";
 import { CustomerInfo } from "../models/order/customer_info";
 import { Order, OrderModel } from "../models/order/order";
 import { OrderStatusType } from "../models/order/order_status";
-import { CancellationReasons, OrderCancellDetails } from "../models/order/status_details/cancelled";
 import { AppError } from "../utils/errors";
 import { CompanyService } from "./company.service";
-import { on } from "events";
-import { Channel, WrappedBalancer } from "queueable";
+import { pubSubService } from "./pubsub.service";
 
 export class OrderService {
     /**
@@ -32,7 +29,7 @@ export class OrderService {
                 password: order.password,
             },
         });
-        ordersUpdateService.orderUpdate(newOrder.toObject());
+        pubSubService.publish("orders", newOrder.toObject());
         return newOrder.toObject();
     }
 
@@ -78,7 +75,7 @@ export class OrderService {
                 actor: "customer",
             };
             await order.save();
-            ordersUpdateService.orderUpdate(order.toObject());
+            pubSubService.publish("orders", order.toObject());
             return order.toObject();
         } else {
             order.status.currentStatus = OrderStatusType.canceled;
@@ -89,7 +86,7 @@ export class OrderService {
                 employeeId: authData.entityId,
             };
             await order.save();
-            ordersUpdateService.orderUpdate(order.toObject());
+            pubSubService.publish("orders", order.toObject());
             return order.toObject();
         }
     }
@@ -129,47 +126,10 @@ export class OrderService {
     }
 
     static async watchOrdersUpdates(customerId?: string) {
-        return ordersUpdateService.watchOrdersUpdates(customerId);
+        return pubSubService.subscribe<Order>("orders", (order) => order.customerInfo.customerId == customerId);
     }
 
     static async watchOrderUpdates(orderId: string) {
-        return ordersUpdateService.watchOrderUpdates(orderId);
+        return pubSubService.subscribe<Order>("orders", (order) => order.id == orderId);
     }
 }
-
- class OrdersUpdateService extends EventEmitter {
-    orderUpdate(order: Order) {
-        this.emit("_", order);
-    }
-
-    watchOrdersUpdates(customerId?: string): WrappedBalancer<Order> {
-        const channel = new Channel<Order>();
-
-        const localListener = (order: Order) => {
-            if (customerId) {
-                if (order.customerInfo.customerId == customerId) channel.push(order);
-            } else {
-                channel.push(order);
-            }
-        };
-
-        this.on("_", localListener);
-
-        const iterable = channel.wrap(() => this.off("_", localListener));
-        return iterable;
-    }
-
-    watchOrderUpdates(orderId: string): WrappedBalancer<Order> {
-        const channel = new Channel<Order>();
-
-        const localListener = (order: Order) => {
-            if (order.id == orderId) channel.push(order);
-        };
-
-        this.on("_", localListener);
-
-        const iterable = channel.wrap(() => this.off("_", localListener));
-        return iterable;
-    }
-}
-export const ordersUpdateService = new OrdersUpdateService();
