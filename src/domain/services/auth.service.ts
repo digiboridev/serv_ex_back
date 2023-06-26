@@ -115,42 +115,46 @@ export class AuthService {
         }
     }
 
-    static async googleSignInClient(code: string) {
-        const tokenBaseUrl = "https://oauth2.googleapis.com/token";
-        const client_id = "837488464728-2pa13rg6na7arm85sj15i0052ep4mi21.apps.googleusercontent.com";
-        const client_secret = "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";
-        const redirect_uri = "http://localhost:63895/auth.html";
-        const grant_type = "authorization_code";
-
-        const values = {
-            code,
-            client_id: client_id,
-            client_secret: client_secret,
-            redirect_uri: redirect_uri,
-            grant_type: grant_type,
-        };
-
-        // const codeUrl = `${tokenBaseUrl}?code=${code}&client_id=${client_id}&client_secret=${client_secret}&redirect_uri=${redirect_uri}&grant_type=${grant_type}`;
-
-        try {
-            const codeResponse = await axios.post(tokenBaseUrl, qs.stringify(values), {
+    static async googleSignInClient(code: string): Promise<{ authData: AuthData; refreshToken: string; accessToken: string } | { registrationToken: string }> {
+        const codeResponse = await axios.post(
+            "https://oauth2.googleapis.com/token",
+            qs.stringify({
+                code,
+                client_id: "837488464728-2pa13rg6na7arm85sj15i0052ep4mi21.apps.googleusercontent.com",
+                client_secret: "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",
+                redirect_uri: "http://localhost:50723/auth.html",
+                grant_type: "authorization_code",
+            }),
+            {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
-            });
+            }
+        );
 
-            const { access_token, id_token } = codeResponse.data;
+        const { access_token, id_token } = codeResponse.data;
 
-            const userResponse = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`, {
-                headers: {
-                    Authorization: `Bearer ${id_token}`,
-                },
-            });
+        const userResponse = await axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`, {
+            headers: {
+                Authorization: `Bearer ${id_token}`,
+            },
+        });
 
-            const { email, name, given_name, family_name } = userResponse.data;
-            console.log(userResponse.data);
-        } catch (error) {
-            console.log(error);
+        const { email, verified_email } = userResponse.data;
+        if (!email) throw new AppError("Email not found", 400);
+        if (!verified_email) throw new AppError("Email not verified", 400);
+
+        const user = await UsersService.userByEmail(email);
+
+        if (!user) {
+            const registrationToken = this.signRegistrationToken(email, "email");
+            return { registrationToken };
+        } else {
+            const authData = await this.createAuthData({ id: user.id, scope: "customer" });
+            const session = await AuthService.createSession({ id: user.id, scope: "customer" });
+            const refreshToken = AuthService.signRefreshToken(session.id);
+            const accessToken = AuthService.signAccessToken(authData);
+            return { authData: authData, refreshToken: refreshToken, accessToken: accessToken };
         }
     }
 

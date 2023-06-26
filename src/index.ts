@@ -1,10 +1,9 @@
 import { connect } from "mongoose";
-import { RedisModules, createClient } from "redis";
 import { FastifyFactory } from "./api/fastify/factory";
-import { PubSubServiceEmitterImpl, PubSubServiceRedisImpl } from "./domain/services/pubsub.service";
+import { PubSubServiceRedisImpl } from "./domain/services/pubsub.service";
 import { SL } from "./core/service_locator";
-import { kMongoLink, kRedisLink } from "./core/constants";
-import { CacheService, CacheServiceRedisImpl } from "./domain/services/cache.service";
+import { kMongoLink } from "./core/constants";
+import { CacheServiceRedisImpl } from "./domain/services/cache.service";
 
 (async function init() {
     try {

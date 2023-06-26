@@ -38,7 +38,11 @@ export const authRoutes = (fastify: FastifyInstance, _: any, done: Function) => 
         },
         async (request, reply) => {
             const result = await AuthController.googleSignInClient(request.body.code);
-            reply.send({ status: "ok", });
+            if ("registrationToken" in result) {
+                reply.send({ status: "registration_required", ...result });
+            } else {
+                reply.send({ status: "authorized", ...result });
+            }
         }
     );
 
