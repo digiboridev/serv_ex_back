@@ -7,10 +7,10 @@ import { SL } from "./core/service_locator";
 (async function init() {
     try {
         // Connect to MongoDB
-        await connect("mongodb+srv://test123123:p123123@cluster0.qu7uxdd.mongodb.net/?retryWrites=true&w=majority");
+        await connect(kMongoLink);
 
         // Connect to Redis
-        const redisClient = createClient({ url: "rediss://red-cic2m2d9aq03rjkvjjq0:k0Iu1ZsDlYdsuyYYMlO3DQVRw64iIrC3@frankfurt-redis.render.com:6379" });
+        const redisClient = createClient({ url: kRedisLink });
         await redisClient.connect();
 
         // Start fastify server

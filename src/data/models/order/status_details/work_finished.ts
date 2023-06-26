@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { OrderSignSchema } from "./value_objects/sign";
+import { OrderSignSchema } from "./sign";
 
 export const OrderWorkFinishedDetailsSchema = new Schema(
     {

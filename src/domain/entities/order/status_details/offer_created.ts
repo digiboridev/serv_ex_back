@@ -1,4 +1,4 @@
-import { RepairPart } from "./value_objects/repair_parts";
+import { RepairPart } from "./repair_parts";
 
 export type OrderOfferCreatedDetails = {
     employeeId: string;

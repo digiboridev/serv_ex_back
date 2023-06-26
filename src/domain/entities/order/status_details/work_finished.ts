@@ -1,4 +1,4 @@
-import { OrderSign } from "./value_objects/sign";
+import { OrderSign } from "./sign";
 
 export enum FinishedAfterType {
     diagnistic = "diagnistic",

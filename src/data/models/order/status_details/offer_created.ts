@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { RepairPartSchema } from "./value_objects/repair_parts";
+import { RepairPartSchema } from "./repair_parts";
 
 export const OrderOfferCreatedDetailsSchema = new Schema(
     {
