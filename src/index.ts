@@ -1,17 +1,15 @@
 import { connect } from "mongoose";
-import { createClient } from "redis";
+import { RedisModules, createClient } from "redis";
 import { FastifyFactory } from "./api/fastify/factory";
-import { PubSubServiceEmitterImpl } from "./domain/services/pubsub.service";
+import { PubSubServiceEmitterImpl, PubSubServiceRedisImpl } from "./domain/services/pubsub.service";
 import { SL } from "./core/service_locator";
+import { kMongoLink, kRedisLink } from "./core/constants";
+import { CacheService, CacheServiceRedisImpl } from "./domain/services/cache.service";
 
 (async function init() {
     try {
         // Connect to MongoDB
         await connect(kMongoLink);
-
-        // Connect to Redis
-        const redisClient = createClient({ url: kRedisLink });
-        await redisClient.connect();
 
         // Start fastify server
         const fastify = await FastifyFactory.createInstance();
@@ -22,5 +20,6 @@ import { SL } from "./core/service_locator";
         process.exit(1);
     }
 
-    SL.RegisterPubSub = new PubSubServiceEmitterImpl();
+    SL.RegisterPubSub = new PubSubServiceRedisImpl();
+    SL.RegisterCache = new CacheServiceRedisImpl();
 })();
