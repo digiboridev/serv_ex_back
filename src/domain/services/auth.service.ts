@@ -1,15 +1,14 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { AppError, errorMessage } from "../../core/errors";
-import { UsersService } from "./users.service";
 import { AuthData, Entity } from "../entities/auth_data";
 import { SessionModel } from "../../data/mongo/models/session";
-import { CompanyService } from "./company.service";
 import { VerificationService } from "./verification.service";
 import axios from "axios";
 import qs from "qs";
 import { Session } from "../entities/session";
 import { User } from "../entities/user";
 import { kGCId, kGCSecret } from "../../core/constants";
+import { SL } from "../../core/service_locator";
 
 export class AuthService {
     static signAccessToken(authdata: AuthData): string {
@@ -46,9 +45,9 @@ export class AuthService {
 
     static async createAuthData(entity: Entity): Promise<AuthData> {
         if (entity.scope === "customer") {
-            const user = await UsersService.userById(entity.id);
+            const user = await SL.usersRepository.userById(entity.id);
             if (!user) throw new AppError("User not found", 404);
-            const companies = await CompanyService.getCompaniesByMemberId(user.id);
+            const companies = await SL.companiesRepository.getCompaniesByMemberId(user.id);
             const companiesIds = companies.map((company) => company.id);
             return { scope: "customer", entityId: user.id, companiesIds };
         }
@@ -97,11 +96,11 @@ export class AuthService {
         let user: User | null = null;
 
         if (result.credentialType === "phone") {
-            user = await UsersService.userByPhone(result.credential);
+            user = await SL.usersRepository.userByPhone(result.credential);
         }
 
         if (result.credentialType === "email") {
-            user = await UsersService.userByEmail(result.credential);
+            user = await SL.usersRepository.userByEmail(result.credential);
         }
 
         if (!user) {
@@ -145,7 +144,7 @@ export class AuthService {
         if (!email) throw new AppError("Email not found", 400);
         if (!verified_email) throw new AppError("Email not verified", 400);
 
-        const user = await UsersService.userByEmail(email);
+        const user = await SL.usersRepository.userByEmail(email);
 
         if (!user) {
             const registrationToken = this.signRegistrationToken(email, "email");
@@ -187,7 +186,7 @@ export class AuthService {
             if (email !== credential) throw new AppError("Invalid email", 400);
         }
 
-        const user = await UsersService.createUser({
+        const user = await SL.usersRepository.createUser({
             firstName: firstName,
             lastName: lastName,
             email: email,

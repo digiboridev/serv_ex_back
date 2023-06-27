@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { VerificationCode } from "../../../domain/entities/verification_code";
 
 const VerificationCodeSchema = new Schema(
     {
@@ -9,7 +10,15 @@ const VerificationCodeSchema = new Schema(
     },
     {
         timestamps: true,
+        toObject: {
+            virtuals: true,
+            getters: true,
+            transform: function (doc, ret) {
+                delete ret._id;
+                delete ret.__v;
+            },
+        },
     }
 );
 
-export const VerificationCodeModel = model("VerificationCode", VerificationCodeSchema);
+export const VerificationCodeModel = model<VerificationCode>("VerificationCode", VerificationCodeSchema);

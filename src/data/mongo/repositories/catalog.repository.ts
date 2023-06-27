@@ -1,41 +1,35 @@
-import { Model } from "mongoose";
-import { CategoryModel } from "../../data/mongo/models/category";
-import { IssueModel } from "../../data/mongo/models/issue";
-import { AppError } from "../../core/errors";
-import { Category } from "../entities/category";
-import { Issue } from "../entities/issue";
+import { AppError } from "../../../core/errors";
+import { Category } from "../../../domain/entities/category";
+import { Issue } from "../../../domain/entities/issue";
+import { CatalogRepository } from "../../../domain/repositories/catalog.repository";
+import { CategoryModel } from "../models/category";
+import { IssueModel } from "../models/issue";
 
-export class CatalogService {
-    /** Create a new category */
-    static async createCategory(name: string, imageUri: string, parentId: string): Promise<Category> {
+export class CatalogRepositoryMongoImpl implements CatalogRepository {
+    async createCategory(name: string, imageUri: string, parentId: string): Promise<Category> {
         const ct = await CategoryModel.create({ name, imageUri, parentId });
         return ct.toObject();
     }
 
-    /** Return a category by id */
-    static async categoryById(id: string): Promise<Category> {
+    async categoryById(id: string): Promise<Category> {
         const ct = await CategoryModel.findById(id);
         if (!ct) throw new AppError("Category not found", 404);
         return ct.toObject();
     }
 
-    /** Return a list of categories, by default return only the root categories */
-    /** If parentId is provided, return only the child categories that have this parentId */
-    static async categories(parentId?: string): Promise<Category[]> {
+    async categories(parentId?: string): Promise<Category[]> {
         const query = parentId ? { parentId: parentId } : { parentId: null };
         const cts = await CategoryModel.find(query);
         return cts.map((ct) => ct.toObject());
     }
 
-    /** Return an issue by id */
-    static async issueById(id: string): Promise<Issue> {
+    async issueById(id: string): Promise<Issue> {
         const issue = await IssueModel.findById(id);
         if (!issue) throw new AppError("Issue not found", 404);
         return issue.toObject();
     }
 
-    /** Return a list of issues that belong to a category */
-    static async issuesByCategoryId(categoryId: string): Promise<Issue[]> {
+    async issuesByCategoryId(categoryId: string): Promise<Issue[]> {
         const issues: Issue[] = [];
 
         const ct = await CategoryModel.findById(categoryId).populate<{ issues: [] }>("issues");
