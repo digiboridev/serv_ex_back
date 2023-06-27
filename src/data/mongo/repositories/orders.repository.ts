@@ -39,8 +39,12 @@ export class OrdersRepositoryMongoImpl implements OrdersRepository {
     }
 
     async updateOrder(orderId: string, order: Order): Promise<Order> {
-        const updatedOrder = await OrderModel.findByIdAndUpdate(orderId, order);
+        const updatedOrder = await OrderModel.findById(orderId);
         if (!updatedOrder) throw new AppError("Order not found", 404);
+
+        updatedOrder.set(order);
+        await updatedOrder.save();
+
         SL.pubSub.publish("orders", updatedOrder.toObject());
         return updatedOrder.toObject();
     }
