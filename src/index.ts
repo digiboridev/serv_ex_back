@@ -1,14 +1,14 @@
 import { connect } from "mongoose";
 import { FastifyFactory } from "./api/fastify/factory";
-import { PubSubServiceRedisImpl } from "./domain/services/pubsub.service";
 import { SL } from "./core/service_locator";
-import { CacheServiceRedisImpl } from "./domain/services/cache.service";
 import { kMongoLink } from "./core/constants";
 import { CatalogRepositoryMongoImpl } from "./data/mongo/repositories/catalog.repository";
 import { VerificationCodeRepositoryMongoImpl } from "./data/mongo/repositories/verification_code.repository";
 import { UsersRepositoryMongoImpl } from "./data/mongo/repositories/users.repository";
 import { CompaniesRepositoryMongoImpl } from "./data/mongo/repositories/companies.repository";
 import { OrdersRepositoryMongoImpl } from "./data/mongo/repositories/orders.repository";
+import { PubSubRepositoryRedisImpl } from "./data/pubsub.repository";
+import { CacheRepositoryRedisImpl } from "./data/cache.repository";
 
 (async function init() {
     try {
@@ -25,8 +25,8 @@ import { OrdersRepositoryMongoImpl } from "./data/mongo/repositories/orders.repo
         process.exit(1);
     }
 
-    SL.RegisterPubSub = new PubSubServiceRedisImpl();
-    SL.RegisterCache = new CacheServiceRedisImpl();
+    SL.RegisterPubSub = new PubSubRepositoryRedisImpl();
+    SL.RegisterCache = new CacheRepositoryRedisImpl();
     SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
     SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
     SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();

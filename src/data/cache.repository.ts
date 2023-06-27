@@ -1,31 +1,8 @@
 import { RedisClientType, createClient } from "redis";
-import { kRedisLink } from "../../core/constants";
+import { kRedisLink } from "../core/constants";
+import { CacheRepository } from "../domain/repositories/cache.repository";
 
-export interface CacheService {
-    /**
-     * Get a value from cache
-     * @param key string
-     * @returns null if key does not exist
-     *
-     */
-    get<T extends Object>(key: string): Promise<T | null>;
-
-    /**
-     * Set a key value pair in cache
-     * @param key string
-     * @param value must be JSON serializable object
-     * @param ttl time to live in seconds
-     */
-    set<T extends Object>(key: string, value: T, ttl?: number): Promise<void>;
-
-    /**
-     * Delete a key from cache
-     * @param key string
-     */
-    delete(key: string): Promise<void>;
-}
-
-export class CacheServiceRedisImpl implements CacheService {
+export class CacheRepositoryRedisImpl implements CacheRepository {
     private readonly _client: RedisClientType;
     constructor() {
         this._client = createClient({ url: kRedisLink });
@@ -49,7 +26,7 @@ export class CacheServiceRedisImpl implements CacheService {
     }
 }
 
-export class CacheServiceMemoryImpl implements CacheService {
+export class CacheRepositoryMemoryImpl implements CacheRepository {
     private readonly _cache: Map<string, string>;
     constructor() {
         this._cache = new Map();

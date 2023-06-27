@@ -1,29 +1,12 @@
 import { Channel, WrappedBalancer } from "queueable";
 import { EventEmitter } from "events";
 import { RedisClientType, createClient } from "redis";
-import { kRedisLink } from "../../core/constants";
+import { PubSubRepository } from "../domain/repositories/pubsub.repository";
+import { kRedisLink } from "../core/constants";
 
-export interface PubSubService {
-    /**
-     * Publishes data to a topic
-     * @param topic The topic to publish to
-     * @param data The data to publish
-     * @returns void
-     */
-    publish<T>(topic: string, data: T): void;
 
-    /**
-     * Subscribes to a topic
-     * @param topic The topic to subscribe to
-     * @param filter A filter to apply to the data
-     * @returns An iterable that can be used to iterate over the data
-     * @example
-     * const iterable = pubsub.subscribe("topic", (data) => data > 5);
-     **/
-    subscribe<T>(topic: string, filter: (data: T) => boolean): WrappedBalancer<T>;
-}
 
-export class PubSubServiceEmitterImpl extends EventEmitter implements PubSubService {
+export class PubSubRepositoryEmitterImpl extends EventEmitter implements PubSubRepository {
     publish<T>(topic: string, data: T) {
         this.emit(topic, data);
     }
@@ -42,7 +25,7 @@ export class PubSubServiceEmitterImpl extends EventEmitter implements PubSubServ
     }
 }
 
-export class PubSubServiceRedisImpl implements PubSubService {
+export class PubSubRepositoryRedisImpl implements PubSubRepository {
     private readonly _pclient: RedisClientType;
     private readonly _sclient: RedisClientType;
     constructor() {

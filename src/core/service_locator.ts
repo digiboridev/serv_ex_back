@@ -4,12 +4,12 @@ import { CompaniesRepository } from "../domain/repositories/companies.repository
 import { OrdersRepository } from "../domain/repositories/orders.repository";
 import { UsersRepository } from "../domain/repositories/users.repository";
 import { VerificationCodeRepository } from "../domain/repositories/verification_code.repository";
-import { CacheService } from "../domain/services/cache.service";
-import { PubSubService } from "../domain/services/pubsub.service";
+import { CacheRepository } from "../domain/repositories/cache.repository";
+import { PubSubRepository } from "../domain/repositories/pubsub.repository";
 
 export class SL {
-    private static _pubSub: PubSubService;
-    private static _cache: CacheService;
+    private static _pubSub: PubSubRepository;
+    private static _cache: CacheRepository;
     private static _catalogRepository: CatalogRepository;
     private static _verificationCodeRepo: VerificationCodeRepository;
     private static _usersRepository: UsersRepository;
@@ -17,19 +17,19 @@ export class SL {
     private static _ordersRepository: OrdersRepository;
 
 
-    public static set RegisterPubSub(pubSub: PubSubService) {
+    public static set RegisterPubSub(pubSub: PubSubRepository) {
         this._pubSub = pubSub;
     }
 
-    public static get pubSub(): PubSubService {
+    public static get pubSub(): PubSubRepository {
         return this._pubSub;
     }
 
-    public static set RegisterCache(cache: CacheService) {
+    public static set RegisterCache(cache: CacheRepository) {
         this._cache = cache;
     }
 
-    public static get cache(): CacheService {
+    public static get cache(): CacheRepository {
         return this._cache;
     }
 
