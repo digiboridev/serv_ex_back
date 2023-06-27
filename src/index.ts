@@ -2,8 +2,8 @@ import { connect } from "mongoose";
 import { FastifyFactory } from "./api/fastify/factory";
 import { PubSubServiceRedisImpl } from "./domain/services/pubsub.service";
 import { SL } from "./core/service_locator";
-import { kMongoLink } from "./core/constants";
 import { CacheServiceRedisImpl } from "./domain/services/cache.service";
+import { kMongoLink } from "./core/constants";
 
 (async function init() {
     try {

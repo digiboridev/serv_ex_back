@@ -1,3 +1,7 @@
+import * as dotenv from "dotenv";
+dotenv.config();
 
-export const kMongoLink = 'mongodb+srv://test123123:p123123@cluster0.qu7uxdd.mongodb.net/?retryWrites=true&w=majority';
-export const kRedisLink = 'rediss://red-cic2m2d9aq03rjkvjjq0:k0Iu1ZsDlYdsuyYYMlO3DQVRw64iIrC3@frankfurt-redis.render.com:6379';
+export const kMongoLink = process.env.MONGOLINK!;
+export const kRedisLink = process.env.REDISLINK!;
+export const kGCId = process.env.GCID!;
+export const kGCSecret = process.env.GCSECRET!;

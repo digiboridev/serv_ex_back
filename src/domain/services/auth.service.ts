@@ -9,6 +9,7 @@ import axios from "axios";
 import qs from "qs";
 import { Session } from "../entities/session";
 import { User } from "../entities/user";
+import { kGCId, kGCSecret } from "../../core/constants";
 
 export class AuthService {
     static signAccessToken(authdata: AuthData): string {
@@ -120,8 +121,8 @@ export class AuthService {
             "https://oauth2.googleapis.com/token",
             qs.stringify({
                 code,
-                client_id: "837488464728-2pa13rg6na7arm85sj15i0052ep4mi21.apps.googleusercontent.com",
-                client_secret: "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",
+                client_id: kGCId,
+                client_secret: kGCSecret,
                 redirect_uri: "http://localhost:50723/auth.html",
                 grant_type: "authorization_code",
             }),
