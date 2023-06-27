@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 import { DevicePasswordSchema } from "./device_password";
-import { OrderDetails } from "../../../domain/entities/order/order_details";
+import { OrderDetails } from "../../../../domain/entities/order/order_details";
 
 export const OrderDetailsSchema = new Schema(
     {

@@ -12,8 +12,9 @@ import { kMongoLink } from "./core/constants";
 
         // Start fastify server
         const fastify = await FastifyFactory.createInstance();
-        await fastify.listen({ port: 3000 });
-        console.log(`server listening on port 3000`);
+        const port = process.env.PORT || 3000;
+        await fastify.listen({ port: port as number });
+        console.log(`server listening on port ${port}`);
     } catch (error) {
         console.error(error);
         process.exit(1);

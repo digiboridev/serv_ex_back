@@ -1,6 +1,6 @@
 import { NewCompany } from "../dto/new_company";
 import { AuthData, ClientAuthData } from "../entities/auth_data";
-import {  CompanyModel } from "../../data/models/company";
+import {  CompanyModel } from "../../data/mongo/models/company";
 import { AppError } from "../../core/errors";
 import { Company } from "../entities/company";
 

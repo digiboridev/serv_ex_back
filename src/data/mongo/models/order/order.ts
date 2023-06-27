@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { Order } from "../../../domain/entities/order/order";
+import { Order } from "../../../../domain/entities/order/order";
 import { CustomerInfoSchema } from "./customer_info";
 import { OrderDetailsSchema } from "./order_details";
 import { OrderStatusSchema } from "./order_status";

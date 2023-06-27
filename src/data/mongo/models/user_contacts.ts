@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { UserContact } from "../../domain/entities/user_contacts";
+import { UserContact } from "../../../domain/entities/user_contacts";
 
 const UserContactSchema = new Schema(
     {

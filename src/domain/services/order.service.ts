@@ -4,7 +4,7 @@ import { AuthData } from "../entities/auth_data";
 import { AppError } from "../../core/errors";
 import { CompanyService } from "./company.service";
 import { SL } from "../../core/service_locator";
-import { OrderModel } from "../../data/models/order/order";
+import { OrderModel } from "../../data/mongo/models/order/order";
 import { CustomerInfo } from "../entities/order/customer_info";
 import { Order } from "../entities/order/order";
 import { OrderStatusType } from "../entities/order/order_status";

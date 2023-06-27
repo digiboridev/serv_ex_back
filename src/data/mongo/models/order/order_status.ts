@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { OrderStatus } from "../../../domain/entities/order/order_status";
+import { OrderStatus } from "../../../../domain/entities/order/order_status";
 import { OrderAcceptDetailsSchema } from "./status_details/accepted";
 import { OrderCancellDetailsSchema } from "./status_details/cancelled";
 import { OrderClosedDetailsSchema } from "./status_details/closed";

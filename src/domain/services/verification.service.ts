@@ -1,4 +1,4 @@
-import { VerificationCodeModel } from "../../data/models/verification_code";
+import { VerificationCodeModel } from "../../data/mongo/models/verification_code";
 
 export class VerificationService {
     static async createPhoneVerification(phoneNumber: string): Promise<{ code: string; token: string }> {

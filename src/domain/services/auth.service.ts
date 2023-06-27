@@ -2,7 +2,7 @@ import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { AppError, errorMessage } from "../../core/errors";
 import { UsersService } from "./users.service";
 import { AuthData, Entity } from "../entities/auth_data";
-import { SessionModel } from "../../data/models/session";
+import { SessionModel } from "../../data/mongo/models/session";
 import { CompanyService } from "./company.service";
 import { VerificationService } from "./verification.service";
 import axios from "axios";

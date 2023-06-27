@@ -1,6 +1,6 @@
 import { Model } from "mongoose";
-import { CategoryModel } from "../../data/models/category";
-import { IssueModel } from "../../data/models/issue";
+import { CategoryModel } from "../../data/mongo/models/category";
+import { IssueModel } from "../../data/mongo/models/issue";
 import { AppError } from "../../core/errors";
 import { Category } from "../entities/category";
 import { Issue } from "../entities/issue";

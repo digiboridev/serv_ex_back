@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { Session } from "../../domain/entities/session";
+import { Session } from "../../../domain/entities/session";
 
 
 

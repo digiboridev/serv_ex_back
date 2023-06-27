@@ -1,7 +1,7 @@
 import { NewUser } from "../dto/new_user";
 import { NewUserContact } from "../dto/new_user_contact";
-import { UserModel } from "../../data/models/user";
-import { UserContactModel } from "../../data/models/user_contacts";
+import { UserModel } from "../../data/mongo/models/user";
+import { UserContactModel } from "../../data/mongo/models/user_contacts";
 import { AppError } from "../../core/errors";
 import { User } from "../entities/user";
 import { UserContact } from "../entities/user_contacts";

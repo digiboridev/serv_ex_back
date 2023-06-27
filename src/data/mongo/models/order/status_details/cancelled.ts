@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { OrderCancellDetails } from "../../../../domain/entities/order/status_details/cancelled";
+import { OrderCancellDetails } from "../../../../../domain/entities/order/status_details/cancelled";
 
 export const OrderCancellDetailsSchema = new Schema(
     {

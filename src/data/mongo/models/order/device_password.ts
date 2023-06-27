@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { DevicePassword, DevicePatternPassword } from "../../../domain/entities/order/device_password";
+import { DevicePassword, DevicePatternPassword } from "../../../../domain/entities/order/device_password";
 
 
 export const DevicePasswordSchema = new Schema(
