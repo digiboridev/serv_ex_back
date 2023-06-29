@@ -12,4 +12,7 @@ export interface CompaniesRepository {
 
     /** Get all companies where the user is a member */
     getCompaniesByMemberId(userId: string): Promise<Company[]>;
+
+    /** Check if the user is a member of a company */
+    isCompanyMember(companyId: string, userId: string): Promise<boolean>;
 }

@@ -37,8 +37,6 @@ import { prisma } from "./data/postgress/client";
 
     await prisma.$connect();
 
-    
-
     const c = await prisma.category.findMany({
         include: {
             parent: true,
@@ -55,9 +53,6 @@ import { prisma } from "./data/postgress/client";
             },
         },
     });
-
-    const d = await prisma.issueToCategory.findMany({});
-    console.log(d);
 
     console.log(c);
 })();

@@ -1,6 +1,4 @@
-import { WrappedBalancer } from "queueable";
 import { AppError } from "../../../core/errors";
-import { SL } from "../../../core/service_locator";
 import { NewOrder } from "../../../domain/dto/new_order";
 import { Order } from "../../../domain/entities/order/order";
 import { OrdersRepository } from "../../../domain/repositories/orders.repository";
@@ -22,7 +20,6 @@ export class OrdersRepositoryMongoImpl implements OrdersRepository {
                 password: order.password,
             },
         });
-        SL.pubSub.publish("orders", newOrder.toObject());
         return newOrder.toObject();
     }
 
@@ -45,15 +42,6 @@ export class OrdersRepositoryMongoImpl implements OrdersRepository {
         updatedOrder.set(order);
         await updatedOrder.save();
 
-        SL.pubSub.publish("orders", updatedOrder.toObject());
         return updatedOrder.toObject();
-    }
-
-    watchOrdersUpdates(customerId?: string): WrappedBalancer<Order> {
-        return SL.pubSub.subscribe<Order>("orders", (order) => order.customerInfo.customerId == customerId);
-    }
-
-    watchOrderUpdates(orderId: string): WrappedBalancer<Order> {
-        return SL.pubSub.subscribe<Order>("orders", (order) => order.id == orderId);
     }
 }

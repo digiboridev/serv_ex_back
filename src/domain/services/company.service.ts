@@ -36,9 +36,7 @@ export class CompanyService {
 
         // Check if the user is a member of the company manually
         // because the user can be a member of the company but not have up to date auth payload
-        const company = await SL.companiesRepository.getCompanyById(companyId);
-        if (company.membersIds.includes(authData.entityId)) return true;
-
-        return false;
+        const isMember = await SL.companiesRepository.isCompanyMember(companyId, authData.entityId);
+        return isMember;
     }
 }

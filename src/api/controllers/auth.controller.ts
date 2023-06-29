@@ -10,7 +10,7 @@ export class AuthController {
         return await AuthService.phoneSignInClient(phoneNumber);
     }
 
-    static async googleSignInClient(code: string){
+    static async googleSignInClient(code: string): Promise<{ authData: AuthData; refreshToken: string; accessToken: string } | { registrationToken: string }> {
         return await AuthService.googleSignInClient(code);
     }
 

@@ -31,14 +31,14 @@ export class OrderController {
             // Check if user has access to that resource
             const hasAccess = await OrderService.hasAccessToResource(authData, customerInfo);
             if (!hasAccess) throw new AppError("Permission denied", 403);
-            return SL.ordersRepository.watchOrdersUpdates(customerInfo.customerId);
+            return SL.pubSub.subscribe<Order>("orders", (order) => order.customerInfo.customerId == customerInfo.customerId);
         }
 
         // If customerInfo is not specified get all orders for vendor or client orders for client
         if (authData.scope === "customer") {
-            return SL.ordersRepository.watchOrdersUpdates(authData.entityId);
+            return SL.pubSub.subscribe<Order>("orders", (order) => order.customerInfo.customerId == authData.entityId);
         } else {
-            return SL.ordersRepository.watchOrdersUpdates();
+            return SL.pubSub.subscribe<Order>("orders", (order) => true);
         }
     }
 
@@ -46,7 +46,6 @@ export class OrderController {
         const order = await SL.ordersRepository.orderById(orderId);
         const canGetOrder = await OrderService.canGetOrder(order, authData);
         if (!canGetOrder) throw new AppError("Permission denied", 403);
-
         return order;
     }
 
@@ -54,17 +53,20 @@ export class OrderController {
         const order = await SL.ordersRepository.orderById(orderId);
         const canGetOrder = await OrderService.canGetOrder(order, authData);
         if (!canGetOrder) throw new AppError("Permission denied", 403);
-
-        return SL.ordersRepository.watchOrderUpdates(orderId);
+        return SL.pubSub.subscribe<Order>("orders", (order) => order.id == orderId);
     }
 
     static async createOrder(authData: AuthData, order: NewOrder): Promise<Order> {
         const canCreateOrder = await OrderService.canCreateOrder(order, authData);
         if (!canCreateOrder) throw new AppError("Permission denied", 403);
-        return await SL.ordersRepository.createOrder(order);
+        const newOrder = await SL.ordersRepository.createOrder(order);
+        SL.pubSub.publish("orders", newOrder);
+        return newOrder;
     }
 
     static async cancelOrder(authData: AuthData, cancelldata: CancellOrderDto): Promise<Order> {
-        return await OrderService.cancelOrder(cancelldata, authData);
+        const updatedOrder = await OrderService.cancelOrder(cancelldata, authData);
+        SL.pubSub.publish("orders", updatedOrder);
+        return updatedOrder;
     }
 }

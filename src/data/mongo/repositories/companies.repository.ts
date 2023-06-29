@@ -24,4 +24,10 @@ export class CompaniesRepositoryMongoImpl implements CompaniesRepository {
         const companies = await CompanyModel.find({ membersIds: userId });
         return companies.map((company) => company.toObject());
     }
+
+    async isCompanyMember(companyId: string, userId: string): Promise<boolean> {
+        const company = await CompanyModel.findById(companyId);
+        if (!company) return false;
+        return company.membersIds.includes(userId);
+    }
 }

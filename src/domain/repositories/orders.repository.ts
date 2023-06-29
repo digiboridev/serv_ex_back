@@ -17,8 +17,4 @@ export interface OrdersRepository {
     orderById(orderId: string): Promise<Order>;
     /** Update order */
     updateOrder(orderId: string, order: Order): Promise<Order>;
-
-    watchOrdersUpdates(customerId?: string): WrappedBalancer<Order>;
-
-    watchOrderUpdates(orderId: string): WrappedBalancer<Order>;
 }

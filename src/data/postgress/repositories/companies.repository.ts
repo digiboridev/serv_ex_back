@@ -56,4 +56,15 @@ export class CompaniesRepositoryPostgressImpl implements CompaniesRepository {
 
         return companies;
     }
+
+    async isCompanyMember(companyId: string, userId: string): Promise<boolean> {
+        const company = await prisma.companyMembers.findFirst({
+            where: {
+                companyId,
+                userId,
+            },
+        });
+
+        return !!company;
+    }
 }
