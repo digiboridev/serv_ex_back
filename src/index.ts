@@ -9,27 +9,55 @@ import { CompaniesRepositoryMongoImpl } from "./data/mongo/repositories/companie
 import { OrdersRepositoryMongoImpl } from "./data/mongo/repositories/orders.repository";
 import { PubSubRepositoryRedisImpl } from "./data/pubsub.repository";
 import { CacheRepositoryRedisImpl } from "./data/cache.repository";
+import { PrismaClient } from "@prisma/client";
+import { prisma } from "./data/postgress/client";
 
 (async function init() {
-    try {
-        // Connect to MongoDB
-        await connect(kMongoLink);
+    // try {
+    //     // Connect to MongoDB
+    //     await connect(kMongoLink);
 
-        // Start fastify server
-        const fastify = await FastifyFactory.createInstance();
-        const port = process.env.PORT || 3000;
-        await fastify.listen({ port: port as number });
-        console.log(`server listening on port ${port}`);
-    } catch (error) {
-        console.error(error);
-        process.exit(1);
-    }
+    //     // Start fastify server
+    //     const fastify = await FastifyFactory.createInstance();
+    //     const port = process.env.PORT || 3000;
+    //     await fastify.listen({ port: port as number });
+    //     console.log(`server listening on port ${port}`);
+    // } catch (error) {
+    //     console.error(error);
+    //     process.exit(1);
+    // }
 
-    SL.RegisterPubSub = new PubSubRepositoryRedisImpl();
-    SL.RegisterCache = new CacheRepositoryRedisImpl();
-    SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
-    SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
-    SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
-    SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
-    SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
+    // SL.RegisterPubSub = new PubSubRepositoryRedisImpl();
+    // SL.RegisterCache = new CacheRepositoryRedisImpl();
+    // SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
+    // SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
+    // SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
+    // SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
+    // SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
+
+    await prisma.$connect();
+
+    
+
+    const c = await prisma.category.findMany({
+        include: {
+            parent: true,
+            children: {
+                select: {
+                    id: true,
+                },
+            },
+            issueToCategory: {
+                include: {
+                    issue: true,
+                    category: true,
+                },
+            },
+        },
+    });
+
+    const d = await prisma.issueToCategory.findMany({});
+    console.log(d);
+
+    console.log(c);
 })();

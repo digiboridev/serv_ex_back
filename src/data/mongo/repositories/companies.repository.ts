@@ -10,10 +10,8 @@ export class CompaniesRepositoryMongoImpl implements CompaniesRepository {
         return company.toObject();
     }
 
-    async updateMembers(id: string, membersIds: string[]): Promise<Company> {
-        const company = await CompanyModel.findByIdAndUpdate(id, { membersIds });
-        if (!company) throw new AppError("Company not found", 404);
-        return company.toObject();
+    async updateMembers(id: string, membersIds: string[]): Promise<void> {
+        await CompanyModel.findByIdAndUpdate(id, { membersIds });        
     }
 
     async getCompanyById(id: string): Promise<Company> {

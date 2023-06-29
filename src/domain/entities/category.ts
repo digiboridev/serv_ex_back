@@ -2,7 +2,6 @@
 export type Category = {
     id: string;
     name: string;
-    imageUri?: string;
-    parentId?: string;
-    issuesIds: string[];
+    imageUri: string | null;
+    parentId: string | null;
 };

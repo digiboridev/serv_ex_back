@@ -12,6 +12,7 @@
   "dependencies": {
     "@fastify/cors": "^8.2.1",
     "@fastify/websocket": "^8.1.0",
+    "@prisma/client": "^4.16.1",
     "@types/jsonwebtoken": "^9.0.2",
     "axios": "^1.4.0",
     "dotenv": "^16.0.3",
@@ -19,6 +20,7 @@
     "fastify-sse-v2": "^3.1.0",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.2.2",
+    "prisma": "^4.16.1",
     "qs": "^6.11.2",
     "queueable": "^5.3.1",
     "redis": "^4.6.7"

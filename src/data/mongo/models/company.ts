@@ -17,6 +17,7 @@ const CompanySchema = new Schema(
             transform: function (doc, ret) {
                 delete ret._id;
                 delete ret.__v;
+                delete ret.membersIds;
             },
         },
     }
@@ -29,4 +30,4 @@ CompanySchema.virtual("members", {
     justOne: false,
 });
 
-export const CompanyModel = model<Company>("Company", CompanySchema);
+export const CompanyModel = model("Company", CompanySchema);

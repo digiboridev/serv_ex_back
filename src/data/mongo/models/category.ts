@@ -16,6 +16,7 @@ const CategorySchema = new Schema(
             transform: function (doc, ret) {
                 delete ret._id;
                 delete ret.__v;
+                delete ret.issuesIds;
             },
         },
     }
@@ -35,4 +36,4 @@ CategorySchema.virtual("issues", {
     justOne: false,
 });
 
-export const CategoryModel = model<Category>("Category", CategorySchema);
+export const CategoryModel = model("Category", CategorySchema);

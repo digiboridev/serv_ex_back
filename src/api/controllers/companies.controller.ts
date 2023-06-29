@@ -18,14 +18,17 @@ export class CompaniesController {
         return SL.companiesRepository.createCompany(newCompany);
     }
 
-    static async updateMembers(companyId: string, membersIds: string[], authData: AuthData): Promise<Company | null> {
+    static async updateMembers(companyId: string, membersIds: string[], authData: AuthData): Promise<void> {
         if (membersIds.length === 0) throw new AppError("Members list cannot be empty", 400);
 
         // Check if the user can edit the company
         const canEditCompanyOrError = await CompanyService.canEditCompanyOrError(companyId, authData);
         if (canEditCompanyOrError !== true) throw canEditCompanyOrError;
 
-        return SL.companiesRepository.updateMembers(companyId, membersIds);
+        // Add the customer who created the company to the members list
+        if (authData.scope === "customer" && !membersIds.includes(authData.entityId))membersIds.push(authData.entityId);
+
+        await SL.companiesRepository.updateMembers(companyId, membersIds);
     }
 
     static async getCompanyById(companyId: string): Promise<Company | null> {

@@ -1,0 +1,99 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("PRISMALINK")
+  extensions = [postgis]
+}
+
+model Category {
+  id              String            @id @default(uuid())
+  name            String
+  imageUri        String?
+  parentId        String?
+  parent          Category?         @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children        Category[]        @relation("CategoryHierarchy")
+  issueToCategory IssueToCategory[]
+}
+
+model Issue {
+  id              String            @id @default(uuid())
+  title           String
+  description     String
+  issueToCategory IssueToCategory[]
+}
+
+model IssueToCategory {
+  issueId    String
+  categoryId String
+  issue      Issue    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([issueId, categoryId])
+}
+
+model User {
+  id            String           @id @default(uuid())
+  firstName     String
+  lastName      String
+  phone         String           @unique
+  email         String           @unique
+  phoneVerified Boolean          @default(false)
+  emailVerified Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  contacts      UserContact[]
+  companies     CompanyMembers[]
+}
+
+model UserContact {
+  id        String   @id @default(uuid())
+  userId    String
+  firstName String
+  lastName  String
+  phone     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, phone])
+}
+
+model Company {
+  id        String           @id @default(uuid())
+  name      String
+  email     String           @unique
+  publicId  String           @unique
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  members   CompanyMembers[]
+}
+
+model CompanyMembers {
+  id        String   @id @default(uuid())
+  companyId String
+  userId    String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, userId])
+}
+
+
+enum CredentialType {
+  email
+  phone
+} 
+
+model VerificationCode {
+  id             String         @id @default(uuid())
+  credential     String
+  credentialType CredentialType
+  code           String
+  createdAt      DateTime       @default(now())
+}

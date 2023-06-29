@@ -59,8 +59,8 @@ export const companiesRoutes = (fastify: FastifyInstance, _: any, done: Function
             },
         },
         async (request, reply) => {
-            const result = await CompaniesController.updateMembers(request.body.companyId, request.body.membersIds, request.authData);
-            reply.send(result);
+            await CompaniesController.updateMembers(request.body.companyId, request.body.membersIds, request.authData);
+            reply.send("ok");
         }
     );
 

@@ -11,6 +11,41 @@ export class CatalogRepositoryMongoImpl implements CatalogRepository {
         return ct.toObject();
     }
 
+    async createIssue(title: string, description: string, assignCategoryId?: string): Promise<Issue> {
+        if (assignCategoryId) {
+            const ct = await CategoryModel.findById(assignCategoryId);
+            if (!ct) throw new AppError("Category not found", 404);
+
+            const issue = await IssueModel.create({ title, description });
+
+            ct.issuesIds.push(issue.id);
+            await ct.save();
+            return issue.toObject();
+        } else {
+            const issue = await IssueModel.create({ title, description });
+            return issue.toObject();
+        }
+    }
+
+    async assignIssueToCategory(issueId: string, categoryId: string): Promise<void> {
+        const ct = await CategoryModel.findById(categoryId);
+        if (!ct) throw new AppError("Category not found", 404);
+
+        const issue = await IssueModel.findById(issueId);
+        if (!issue) throw new AppError("Issue not found", 404);
+
+        ct.issuesIds.push(issue.id);
+        await ct.save();
+    }
+
+    async unassignIssueToCategory(issueId: string, categoryId: string): Promise<void> {
+        const ct = await CategoryModel.findById(categoryId);
+        if (!ct) throw new AppError("Category not found", 404);
+
+        ct.issuesIds = ct.issuesIds.filter((id) => id !== issueId);
+        await ct.save();
+    }
+
     async categoryById(id: string): Promise<Category> {
         const ct = await CategoryModel.findById(id);
         if (!ct) throw new AppError("Category not found", 404);
