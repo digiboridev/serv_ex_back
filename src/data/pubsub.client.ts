@@ -4,9 +4,14 @@ import { PubSubClient } from "../domain/pubsub.client";
 import { kRedisLink } from "../core/constants";
 import { Redis } from "ioredis";
 
-export class PubSubClientEmitterImpl extends EventEmitter implements PubSubClient {
+export class PubSubClientEmitterImpl implements PubSubClient {
+    private _ee: EventEmitter;
+    constructor() {
+        this._ee = new EventEmitter();
+    }
+
     publish<T>(topic: string, data: T) {
-        this.emit(topic, data);
+        this._ee.emit(topic, data);
     }
 
     subscribe<T>(topic: string, filter: (data: T) => boolean): WrappedBalancer<T> {
@@ -16,9 +21,9 @@ export class PubSubClientEmitterImpl extends EventEmitter implements PubSubClien
             if (filter(data)) channel.push(data);
         };
 
-        this.on(topic, localListener);
+        this._ee.on(topic, localListener);
 
-        const iterable = channel.wrap(() => this.off(topic, localListener));
+        const iterable = channel.wrap(() => this._ee.off(topic, localListener));
         return iterable;
     }
 }
@@ -50,17 +55,18 @@ export class PubSubClientRedisImpl implements PubSubClient {
     }
 }
 
-export class PubSubClientRedisSmartImpl extends EventEmitter implements PubSubClient {
+export class PubSubClientRedisSmartImpl implements PubSubClient {
     private _pub: Redis;
     private _sub: Redis;
+    private _ee: EventEmitter;
 
     constructor() {
-        super();
         this._pub = new Redis(kRedisLink);
         this._sub = new Redis(kRedisLink);
+        this._ee = new EventEmitter();
         this._sub.on("message", (topic, data) => {
             const parsedData = JSON.parse(data);
-            this.emit(topic, parsedData);
+            this._ee.emit(topic, parsedData);
         });
     }
 
@@ -69,19 +75,18 @@ export class PubSubClientRedisSmartImpl extends EventEmitter implements PubSubCl
     }
 
     public subscribe<T>(topic: string, filter: (data: T) => boolean): WrappedBalancer<T> {
-        if (this.listenerCount(topic) === 0) this._sub.subscribe(topic);
-
         const channel = new Channel<T>();
-
+        
         const localListener = (data: T) => {
             if (filter(data)) channel.push(data);
         };
-
-        this.on(topic, localListener);
+        
+        if (this._ee.listenerCount(topic) === 0) this._sub.subscribe(topic);
+        this._ee.on(topic, localListener);
 
         const iterable = channel.wrap(() => {
-            this.off(topic, localListener);
-            if (this.listenerCount(topic) === 0) this._sub.unsubscribe(topic);
+            this._ee.off(topic, localListener);
+            if (this._ee.listenerCount(topic) === 0) this._sub.unsubscribe(topic);
         });
         return iterable;
     }
