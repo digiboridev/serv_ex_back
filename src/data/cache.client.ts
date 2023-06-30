@@ -1,12 +1,11 @@
-import { RedisClientType, createClient } from "redis";
 import { kRedisLink } from "../core/constants";
-import { CacheRepository } from "../domain/repositories/cache.repository";
+import { CacheClient } from "../domain/cache.client";
+import { Redis } from "ioredis";
 
-export class CacheRepositoryRedisImpl implements CacheRepository {
-    private readonly _client: RedisClientType;
+export class CacheClientRedisImpl implements CacheClient {
+    private readonly _client: Redis;
     constructor() {
-        this._client = createClient({ url: kRedisLink });
-        this._client.connect().catch(console.error);
+        this._client = new Redis(kRedisLink);
     }
 
     public async get<T>(key: string) {
@@ -16,9 +15,8 @@ export class CacheRepositoryRedisImpl implements CacheRepository {
     }
 
     public async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-        await this._client.set(key, JSON.stringify(value), {
-            EX: ttl,
-        });
+        await this._client.set(key, JSON.stringify(value));
+        if (ttl) this._client.expire(key, ttl);
     }
 
     public async delete(key: string): Promise<void> {
@@ -26,7 +24,7 @@ export class CacheRepositoryRedisImpl implements CacheRepository {
     }
 }
 
-export class CacheRepositoryMemoryImpl implements CacheRepository {
+export class CacheRepositoryMemoryImpl implements CacheClient {
     private readonly _cache: Map<string, string>;
     constructor() {
         this._cache = new Map();

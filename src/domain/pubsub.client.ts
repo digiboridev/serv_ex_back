@@ -1,6 +1,6 @@
 import { WrappedBalancer } from "queueable";
 
-export interface PubSubRepository {
+export interface PubSubClient {
     /**
      * Publishes data to a topic
      * @param topic The topic to publish to

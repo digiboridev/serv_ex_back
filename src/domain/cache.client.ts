@@ -1,4 +1,4 @@
-export interface CacheRepository {
+export interface CacheClient {
     /**
      * Get a value from cache
      * @param key string
