@@ -10,7 +10,6 @@ import { OrdersRepositoryMongoImpl } from "./data/mongo/repositories/orders.repo
 import { PubSubClientRedisSmartImpl } from "./data/pubsub.client";
 import { CacheClientRedisImpl } from "./data/cache.client";
 
-
 (async function init() {
     try {
         // Connect to MongoDB
@@ -33,6 +32,4 @@ import { CacheClientRedisImpl } from "./data/cache.client";
     SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
     SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
     SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
-
-    
 })();
