@@ -25,19 +25,20 @@ export class CacheClientRedisImpl implements CacheClient {
 }
 
 export class CacheRepositoryMemoryImpl implements CacheClient {
-    private readonly _cache: Map<string, string>;
+    private readonly _cache: Map<string, any>;
     constructor() {
         this._cache = new Map();
     }
 
     public async get<T>(key: string) {
-        const string = this._cache.get(key);
-        if (!string) return null;
-        return JSON.parse(string) as T;
+        const value = this._cache.get(key);
+        if (!value) return null;
+        return value as T;
     }
 
     public async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-        this._cache.set(key, JSON.stringify(value));
+        this._cache.set(key, value);
+        if (ttl) setTimeout(() => this._cache.delete(key), ttl * 1000);
     }
 
     public async delete(key: string): Promise<void> {
