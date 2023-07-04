@@ -46,8 +46,12 @@ export class OrderController {
         let order = await SL.cache.get<Order>(`order:${orderId}`);
 
         if (!order) {
+            const lock = await SL.dlock.acquireLock(`order:${orderId}`, 10000);
+            
             order = await SL.ordersRepository.orderById(orderId);
             SL.cache.set(`order:${orderId}`, order);
+
+            lock.release();
         }
 
         const canGetOrder = await OrderService.canGetOrder(order, authData);
@@ -74,10 +78,14 @@ export class OrderController {
     }
 
     static async cancelOrder(authData: AuthData, cancelldata: CancellOrderDto): Promise<Order> {
+        const lock = await SL.dlock.acquireLock(`order:${cancelldata.orderId}`, 2000);
+
         const updatedOrder = await OrderService.cancelOrder(cancelldata, authData);
 
         SL.pubSub.publish("orders", updatedOrder);
         SL.cache.delete(`order:${cancelldata.orderId}`);
+
+        lock.release();
         return updatedOrder;
     }
 }

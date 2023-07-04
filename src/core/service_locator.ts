@@ -6,10 +6,12 @@ import { UsersRepository } from "../domain/repositories/users.repository";
 import { VerificationCodeRepository } from "../domain/repositories/verification_code.repository";
 import { CacheClient } from "../domain/cache.client";
 import { PubSubClient } from "../domain/pubsub.client";
+import { DLockClient } from "../domain/dlock.client";
 
 export class SL {
     private static _pubSub: PubSubClient;
     private static _cache: CacheClient;
+    private static _dlock: DLockClient;
     private static _catalogRepository: CatalogRepository;
     private static _verificationCodeRepo: VerificationCodeRepository;
     private static _usersRepository: UsersRepository;
@@ -31,6 +33,14 @@ export class SL {
 
     public static get cache(): CacheClient {
         return this._cache;
+    }
+
+    public static set RegisterDLock(dlock: DLockClient) {
+        this._dlock = dlock;
+    }
+
+    public static get dlock(): DLockClient {
+        return this._dlock;
     }
 
     public static set RegisterCatalogRepository(catalogRepository: CatalogRepository) {

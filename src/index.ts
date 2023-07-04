@@ -9,6 +9,7 @@ import { CompaniesRepositoryMongoImpl } from "./data/mongo/repositories/companie
 import { OrdersRepositoryMongoImpl } from "./data/mongo/repositories/orders.repository";
 import { PubSubClientRedisSmartImpl } from "./data/pubsub.client";
 import { CacheClientRedisImpl } from "./data/cache.client";
+import { DLockClientRedisImpl } from "./data/dlock.client";
 
 (async function init() {
     try {
@@ -27,9 +28,11 @@ import { CacheClientRedisImpl } from "./data/cache.client";
 
     SL.RegisterPubSub = new PubSubClientRedisSmartImpl();
     SL.RegisterCache = new CacheClientRedisImpl();
+    SL.RegisterDLock = new DLockClientRedisImpl();
     SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
     SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
     SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
     SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
     SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
+
 })();
