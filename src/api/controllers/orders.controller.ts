@@ -47,9 +47,9 @@ export class OrderController {
 
         if (!order) {
             const lock = await SL.dlock.acquireLock(`order:${orderId}`, 10000);
-            
+
             order = await SL.ordersRepository.orderById(orderId);
-            SL.cache.set(`order:${orderId}`, order);
+            SL.cache.set(`order:${orderId}`, order, 60 * 60 * 2);
 
             lock.release();
         }
@@ -64,7 +64,7 @@ export class OrderController {
         const order = await SL.ordersRepository.orderById(orderId);
         const canGetOrder = await OrderService.canGetOrder(order, authData);
         if (!canGetOrder) throw new AppError("Permission denied", 403);
-        
+
         return SL.pubSub.subscribe<Order>("orders", (order) => order.id == orderId);
     }
 
