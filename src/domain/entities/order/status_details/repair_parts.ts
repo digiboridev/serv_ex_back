@@ -1,14 +1,13 @@
-
 export type RepairSubpart = {
     name: string;
-    date: Date;
+    date: number;
     price: number;
     note: string;
 };
 
 export type RepairPart = {
     name: string;
-    date: Date;
+    date: number;
     price: number;
     subparts: RepairSubpart[];
     note: string;

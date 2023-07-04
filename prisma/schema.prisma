@@ -84,11 +84,10 @@ model CompanyMembers {
   @@unique([companyId, userId])
 }
 
-
 enum CredentialType {
   email
   phone
-} 
+}
 
 model VerificationCode {
   id             String         @id @default(uuid())
@@ -96,4 +95,73 @@ model VerificationCode {
   credentialType CredentialType
   code           String
   createdAt      DateTime       @default(now())
+}
+
+model Order {
+  id             String       @id @default(uuid())
+  customerInfoId String       @unique
+  customerInfo   CustomerInfo @relation(fields: [customerInfoId], references: [id])
+  detailsId      String       @unique
+  details        OrderDetails @relation(fields: [detailsId], references: [id])
+  statusId       String       @unique
+  status         OrderStatus  @relation(fields: [statusId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+enum CustomerType {
+  personal
+  company
+}
+
+model CustomerInfo {
+  id           String       @id @default(uuid())
+  orderId      String       @unique
+  customerId   String
+  customerType CustomerType
+  Order        Order?
+}
+
+model OrderDetails {
+  id                    String   @id @default(uuid())
+  categoryId            String
+  issueIds              String[]
+  description           String
+  deviceWet             Boolean
+  wetDescription        String?
+  accesoriesIncluded    Boolean
+  accesoriesDescription String?
+  hasWaranty            Boolean
+  password              Json?
+  Order                 Order?
+}
+
+enum OrderStatusType {
+  newOrder
+  accepted
+  onDiagnostic
+  offerCreated
+  confirmedOffer
+  declinedOffer
+  waitingForParts
+  inProgress
+  workFinished
+  closed
+  canceled
+}
+
+model OrderStatus {
+  id                     String          @id @default(uuid())
+  currentStatus          OrderStatusType
+  acceptedDetails        Json?
+  onDiagnosticDetails    Json?
+  offerCreatedDetails    Json?
+  confirmedOfferDetails  Json?
+  declinedOfferDetails   Json?
+  waitingForPartsDetails Json?
+  inProgressDetails      Json?
+  workFinishedDetails    Json?
+  closedDetails          Json?
+  cancellDetails         Json?
+  Order                  Order?
 }

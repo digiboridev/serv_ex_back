@@ -9,5 +9,5 @@ export type OrderDetails = {
     accesoriesIncluded: boolean;
     accesoriesDescription?: string;
     hasWaranty: boolean;
-    password: DevicePassword;
+    password?: DevicePassword;
 };

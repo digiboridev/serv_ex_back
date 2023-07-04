@@ -65,6 +65,8 @@ export class PubSubClientRedisSmartImpl implements PubSubClient {
         this._sub = new Redis(kRedisLink);
         this._ee = new EventEmitter();
         this._sub.on("message", (topic, data) => {
+            const listeners = this._ee.listenerCount(topic);
+            console.log(`[PubSubClientRedisSmartImpl] ${topic} data, listeners:${listeners} `);
             const parsedData = JSON.parse(data);
             this._ee.emit(topic, parsedData);
         });
@@ -76,11 +78,11 @@ export class PubSubClientRedisSmartImpl implements PubSubClient {
 
     public subscribe<T>(topic: string, filter: (data: T) => boolean): WrappedBalancer<T> {
         const channel = new Channel<T>();
-        
+
         const localListener = (data: T) => {
             if (filter(data)) channel.push(data);
         };
-        
+
         if (this._ee.listenerCount(topic) === 0) this._sub.subscribe(topic);
         this._ee.on(topic, localListener);
 

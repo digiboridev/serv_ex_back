@@ -60,6 +60,7 @@ export class OrderController {
         const order = await SL.ordersRepository.orderById(orderId);
         const canGetOrder = await OrderService.canGetOrder(order, authData);
         if (!canGetOrder) throw new AppError("Permission denied", 403);
+        
         return SL.pubSub.subscribe<Order>("orders", (order) => order.id == orderId);
     }
 
@@ -67,15 +68,16 @@ export class OrderController {
         const canCreateOrder = await OrderService.canCreateOrder(order, authData);
         if (!canCreateOrder) throw new AppError("Permission denied", 403);
         const newOrder = await SL.ordersRepository.createOrder(order);
+
         SL.pubSub.publish("orders", newOrder);
         return newOrder;
     }
 
     static async cancelOrder(authData: AuthData, cancelldata: CancellOrderDto): Promise<Order> {
         const updatedOrder = await OrderService.cancelOrder(cancelldata, authData);
+
         SL.pubSub.publish("orders", updatedOrder);
         SL.cache.delete(`order:${cancelldata.orderId}`);
-
         return updatedOrder;
     }
 }

@@ -16,5 +16,5 @@ export interface OrdersRepository {
     /** Get order by id */
     orderById(orderId: string): Promise<Order>;
     /** Update order */
-    updateOrder(orderId: string, order: Order): Promise<Order>;
+    updateOrder(orderId: string, order: Omit<Order, "id" | "cretedAt" | "updateAt">): Promise<Order>;
 }
