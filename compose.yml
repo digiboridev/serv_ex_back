@@ -1,0 +1,20 @@
+services:
+
+  redis:
+    image: "redis:alpine"
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    ports:
+      - "3000:1337"
+    expose:
+      - 1337
+    environment:
+      - PORT=1337
+      - REDISLINK=redis://redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped

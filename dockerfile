@@ -7,5 +7,3 @@ RUN npm install
 COPY . .
 RUN npm run build:ts
 CMD ["npm", "run", "start"]
-EXPOSE 3000
-ENV PORT=3000
