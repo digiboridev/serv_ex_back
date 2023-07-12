@@ -91,7 +91,7 @@ export class AuthService {
         code: string
     ): Promise<{ authData: AuthData; refreshToken: string; accessToken: string } | { registrationToken: string }> {
         const result = await VerificationService.verifyCode(token, code);
-        if (!result) throw new AppError("Invalid code", 400);
+        if (!result) throw new AppError("Invalid verification code", 400);
 
         let user: User | null = null;
 

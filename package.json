@@ -1,12 +1,16 @@
 {
   "name": "serve_expert_backend",
   "scripts": {
+    "debug:nodemon": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "debug:tsw": "tsc --watch",
     "build": "npm i && tsc",
-    "build:watch": "tsc --watch",
-    "start": "node lib/index.js"
+    "build:ts": "tsc",
+    "build:docker": "docker build -t se_back .",
+    "start": "node lib/index.js",
+    "start:docker": "docker stop se_back && docker rm se_back || true && docker run -d --name se_back -p 3000:3000 se_back"
   },
   "engines": {
-    "node": "16"
+    "node": "20"
   },
   "main": "lib/index.js",
   "dependencies": {

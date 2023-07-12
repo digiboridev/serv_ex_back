@@ -13,7 +13,12 @@ import { usersRoutes } from "./routes/users.routes";
 export class FastifyFactory {
     static async createInstance(): Promise<FastifyInstance> {
         const fastify = Fastify();
-        await fastify.register(cors, {});
+        await fastify.register(cors, {
+            origin: "*",
+            methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            credentials: true,
+        });
         await fastify.register(FastifySSEPlugin);
         await fastify.register(fastifyWebsocket);
         await fastify.register(authRoutes, { prefix: "/auth" });
