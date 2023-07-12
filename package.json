@@ -10,7 +10,7 @@
     "start:docker": "docker stop se_back && docker rm se_back || true && docker run -d --name se_back -p 3000:3000 se_back"
   },
   "engines": {
-    "node": "20"
+    "node": ">=18"
   },
   "main": "lib/index.js",
   "dependencies": {

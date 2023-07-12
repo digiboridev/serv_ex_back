@@ -9,6 +9,7 @@ import { companiesRoutes } from "./routes/companies.routes";
 import { ordersRoutes } from "./routes/orders.routes";
 import { userRoutes } from "./routes/user.routes";
 import { usersRoutes } from "./routes/users.routes";
+import { SL } from "../../core/service_locator";
 
 export class FastifyFactory {
     static async createInstance(): Promise<FastifyInstance> {
@@ -37,7 +38,37 @@ export class FastifyFactory {
             }
         });
 
-        fastify.get("/healthcheck", (_, reply) => reply.send({ status: "ok" }));
+        fastify.get("/debug/healthcheck", (_, reply) => reply.send({ status: "ok" }));
+
+        fastify.get("/debug/sse", (_, res) => {
+            res.sse(
+                (async function* source() {
+                    for (let i = 0; i < 10; i++) {
+                        await new Promise((resolve) => setTimeout(resolve, 1000));
+                        yield { id: String(i), data: "Some message" };
+                    }
+                })()
+            );
+        });
+
+        fastify.get("/debug/ws", { websocket: true }, (connection) => {
+            connection.socket.on("message", (message) => {
+                connection.socket.send(message.toString());
+            });
+        });
+
+        fastify.post("/debug/cache", async (request, reply) => {
+            const { key, value } = request.body as { key: string; value: string };
+            await SL.cache.set(key, value);
+            reply.send({ status: "ok" });
+        });
+
+        fastify.get("/debug/cache", async (request, reply) => {
+            const { key } = request.query as { key: string };
+            const value = await SL.cache.get(key);
+            reply.send({ status: "ok", value });
+        });
+
         return fastify;
     }
 }

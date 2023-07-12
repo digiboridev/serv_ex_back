@@ -13,6 +13,16 @@ import { DLockClientRedisImpl } from "./data/dlock.client";
 
 (async function init() {
     try {
+        // Register dependencies
+        SL.RegisterPubSub = new PubSubClientRedisSmartImpl();
+        SL.RegisterCache = new CacheClientRedisImpl();
+        SL.RegisterDLock = new DLockClientRedisImpl();
+        SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
+        SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
+        SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
+        SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
+        SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
+
         // Connect to MongoDB
         await connect(kMongoLink);
 
@@ -25,14 +35,4 @@ import { DLockClientRedisImpl } from "./data/dlock.client";
         console.error(error);
         process.exit(1);
     }
-
-    SL.RegisterPubSub = new PubSubClientRedisSmartImpl();
-    SL.RegisterCache = new CacheClientRedisImpl();
-    SL.RegisterDLock = new DLockClientRedisImpl();
-    SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
-    SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
-    SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
-    SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
-    SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
-
 })();
