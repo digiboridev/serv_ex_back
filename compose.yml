@@ -2,19 +2,36 @@ services:
 
   redis:
     image: "redis:alpine"
+    expose: [6379]
     restart: unless-stopped
 
-  backend:
+  backend_1:
     build: 
       context: .
       dockerfile: dockerfile
-    ports:
-      - "3000:1337"
-    expose:
-      - 1337
+    expose: [1000]
     environment:
-      - PORT=1337
+      - PORT=1000
       - REDISLINK=redis://redis:6379
-    depends_on:
-      - redis
+    depends_on: [redis]
+    restart: unless-stopped
+  
+  backend_2:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    expose: [1000]
+    environment:
+      - PORT=1000
+      - REDISLINK=redis://redis:6379
+    depends_on: [redis]
+    restart: unless-stopped
+
+  envoy:
+    image: envoyproxy/envoy:dev-3f198ba35873bba736374ea568fcfa6c4d903215
+    ports:
+      - "3000:10000"
+      - "9901:9901"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
     restart: unless-stopped

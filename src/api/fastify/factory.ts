@@ -38,7 +38,10 @@ export class FastifyFactory {
             }
         });
 
-        fastify.get("/debug/healthcheck", (_, reply) => reply.send({ status: "ok" }));
+        fastify.get("/debug/healthcheck", (_, reply) => {
+            console.log("healthcheck");
+            reply.send({ status: "ok" });
+        });
 
         fastify.get("/debug/sse", (_, res) => {
             res.sse(
