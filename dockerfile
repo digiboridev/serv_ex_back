@@ -2,8 +2,20 @@
    
 FROM node:20.4-alpine
 WORKDIR /app
-COPY package*.json ./
+
+# Install dependencies
+COPY package.json .
 RUN npm install
-COPY . .
+
+# Copy prisma schema and generate client
+COPY /prisma ./prisma
+RUN npm run build:prisma
+
+# Copy source code and build typescript
+COPY /src ./src
+COPY tsconfig.json .
+COPY .env .
 RUN npm run build:ts
+
+# run
 CMD ["npm", "run", "start"]
