@@ -15,15 +15,15 @@ import { StorageClientMinioImpl } from "./data/storage.client";
 (async function init() {
     try {
         // Register dependencies
-        SL.RegisterPubSub = new PubSubClientRedisSmartImpl();
-        SL.RegisterCache = new CacheClientRedisImpl();
-        SL.RegisterDLock = new DLockClientRedisImpl();
-        SL.RegisterCatalogRepository = new CatalogRepositoryMongoImpl();
-        SL.RegisterVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
-        SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
-        SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
-        SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
-        SL.RegisterStorage = new StorageClientMinioImpl();
+        SL.registerPubSub = new PubSubClientRedisSmartImpl();
+        SL.registerCache = new CacheClientRedisImpl();
+        SL.registerDLock = new DLockClientRedisImpl();
+        SL.registerCatalogRepository = new CatalogRepositoryMongoImpl();
+        SL.registerVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
+        SL.registerUsersRepository = new UsersRepositoryMongoImpl();
+        SL.registerCompaniesRepository = new CompaniesRepositoryMongoImpl();
+        SL.registerOrdersRepository = new OrdersRepositoryMongoImpl();
+        SL.registerStorage = new StorageClientMinioImpl();
         
         // Connect to MongoDB
         await connect(kMongoLink);

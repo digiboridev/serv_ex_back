@@ -1,5 +1,5 @@
 import { Client } from "minio";
-import { kMinioAcc, kMinioEnd, kMinioPort, kMinioPwd, kStorageDomain } from "../core/constants";
+import { kStorageAcc, kStorageAddr, kStoragePort, kStoragePwd, kStorageDomain } from "../core/constants";
 import { AppError } from "../core/errors";
 import { IncomingMessage } from "http";
 import { Readable } from "stream";
@@ -9,10 +9,10 @@ export class StorageClientMinioImpl implements StorageClient {
     private _client: Client;
     constructor() {
         this._client = new Client({
-            endPoint: kMinioEnd,
-            port: +kMinioPort,
-            accessKey: kMinioAcc,
-            secretKey: kMinioPwd,
+            endPoint: kStorageAddr,
+            port: +kStoragePort,
+            accessKey: kStorageAcc,
+            secretKey: kStoragePwd,
             useSSL: false,
         });
     }

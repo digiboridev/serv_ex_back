@@ -22,75 +22,30 @@ export class SL {
 
 
 
-    public static set RegisterPubSub(pubSub: PubSubClient) {
-        this._pubSub = pubSub;
-    }
+    public static set registerPubSub(pubSub: PubSubClient) { this._pubSub = pubSub }
+    public static get pubSub(): PubSubClient { return this._pubSub }
 
-    public static get pubSub(): PubSubClient {
-        return this._pubSub;
-    }
+    public static set registerCache(cache: CacheClient) { this._cache = cache }
+    public static get cache(): CacheClient { return this._cache }
 
-    public static set RegisterCache(cache: CacheClient) {
-        this._cache = cache;
-    }
+    public static set registerDLock(dlock: DLockClient) { this._dlock = dlock }
+    public static get dlock(): DLockClient { return this._dlock }
 
-    public static get cache(): CacheClient {
-        return this._cache;
-    }
+    public static set registerStorage(storage: StorageClient) { this._storage = storage }
+    public static get storage(): StorageClient { return this._storage }
 
-    public static set RegisterDLock(dlock: DLockClient) {
-        this._dlock = dlock;
-    }
+    public static set registerCatalogRepository(catalogRepository: CatalogRepository) { this._catalogRepository = catalogRepository }
+    public static get catalogRepository(): CatalogRepository { return this._catalogRepository }
 
-    public static get dlock(): DLockClient {
-        return this._dlock;
-    }
+    public static set registerVerificationCodeRepository(verificationCodeRepo: VerificationCodeRepository) { this._verificationCodeRepo = verificationCodeRepo }
+    public static get verificationCodeRepo(): VerificationCodeRepository { return this._verificationCodeRepo }
 
-    public static set RegisterStorage(storage: StorageClient) {
-        this._storage = storage;
-    }
-
-    public static get storage(): StorageClient {
-        return this._storage;
-    }
-
-    public static set RegisterCatalogRepository(catalogRepository: CatalogRepository) {
-        this._catalogRepository = catalogRepository;
-    }
-
-    public static get catalogRepository(): CatalogRepository {
-        return this._catalogRepository;
-    }
-
-    public static set RegisterVerificationCodeRepository(verificationCodeRepo: VerificationCodeRepository) {
-        this._verificationCodeRepo = verificationCodeRepo;
-    }
-
-    public static get verificationCodeRepo(): VerificationCodeRepository {
-        return this._verificationCodeRepo;
-    }
-
-    public static set RegisterUsersRepository(usersRepository: UsersRepository) {
-        this._usersRepository = usersRepository;
-    }
-
-    public static get usersRepository(): UsersRepository {
-        return this._usersRepository;
-    }
+    public static set registerUsersRepository(usersRepository: UsersRepository) { this._usersRepository = usersRepository }
+    public static get usersRepository(): UsersRepository { return this._usersRepository }
     
-    public static set RegisterCompaniesRepository(companiesRepository: CompaniesRepository) {
-        this._companiesRepository = companiesRepository;
-    }
-
-    public static get companiesRepository(): CompaniesRepository {
-        return this._companiesRepository;
-    }
+    public static set registerCompaniesRepository(companiesRepository: CompaniesRepository) { this._companiesRepository = companiesRepository }
+    public static get companiesRepository(): CompaniesRepository { return this._companiesRepository }
     
-    public static set RegisterOrdersRepository(ordersRepository: OrdersRepository) {
-        this._ordersRepository = ordersRepository;
-    }
-
-    public static get ordersRepository(): OrdersRepository {
-        return this._ordersRepository;
-    }
+    public static set registerOrdersRepository(ordersRepository: OrdersRepository) { this._ordersRepository = ordersRepository }
+    public static get ordersRepository(): OrdersRepository { return this._ordersRepository }
 }
