@@ -6,7 +6,7 @@ export interface StorageClient {
      * @param bucket The bucket name
      * @param grantPublicRead If true, grant everyone access to get files from the bucket directly
      */
-    upsertBucket(bucket: string, grantPublicRead: boolean): Promise<void>;
+    upsertBucket(bucket: string, grantPublicRead?: boolean): Promise<void>;
 
     /**
      * Uploads a file to the storage service

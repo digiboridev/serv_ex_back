@@ -8,10 +8,16 @@ import { StorageClient } from "../domain/storage.client";
 export class StorageClientMinioImpl implements StorageClient {
     private _client: Client;
     constructor() {
-        this._client = new Client({ endPoint: kMinioEnd, port: +kMinioPort, accessKey: kMinioAcc, secretKey: kMinioPwd });
+        this._client = new Client({
+            endPoint: kMinioEnd,
+            port: +kMinioPort,
+            accessKey: kMinioAcc,
+            secretKey: kMinioPwd,
+            useSSL: false,
+        });
     }
 
-    async upsertBucket(bucket: string, grantPublicRead: boolean): Promise<void> {
+    async upsertBucket(bucket: string, grantPublicRead?: boolean): Promise<void> {
         const bucketExists = await this._client.bucketExists(bucket);
         if (!bucketExists) await this._client.makeBucket(bucket, "us-east-1");
         if (!bucketExists && grantPublicRead) {

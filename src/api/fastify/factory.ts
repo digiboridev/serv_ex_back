@@ -10,6 +10,10 @@ import { ordersRoutes } from "./routes/orders.routes";
 import { userRoutes } from "./routes/user.routes";
 import { usersRoutes } from "./routes/users.routes";
 import { SL } from "../../core/service_locator";
+import multer from "fastify-multer";
+import { File } from "fastify-multer/lib/interfaces";
+import sharp from "sharp";
+import { randomUUID } from "crypto";
 
 export class FastifyFactory {
     static async createInstance(): Promise<FastifyInstance> {
@@ -17,9 +21,8 @@ export class FastifyFactory {
         await fastify.register(cors, {
             origin: "*",
             methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            allowedHeaders: ["Content-Type", "Authorization"],
-            credentials: true,
         });
+        await fastify.register(multer.contentParser);
         await fastify.register(FastifySSEPlugin);
         await fastify.register(fastifyWebsocket);
         await fastify.register(authRoutes, { prefix: "/auth" });
@@ -71,6 +74,51 @@ export class FastifyFactory {
             const value = await SL.cache.get(key);
             reply.send({ status: "ok", value });
         });
+
+        fastify.post("/debug/file", { preHandler: multer().single("file") }, async (request, reply) => {
+            console.log("debug file pre");
+            const file = (request as any).file as File;
+            if (!file || !file.buffer) return;
+            const name: string | undefined = (request.body as any).name;
+
+            await SL.storage.upsertBucket("files", true);
+            await SL.storage.uploadFile(file.buffer, "files", name ?? file.originalname, file.mimetype);
+
+            console.log("debug file");
+            reply.send({ status: "ok" });
+        });
+
+        fastify.post("/debug/image", { preHandler: multer().single("image") }, async (request, reply) => {
+            const file = (request as any).file as File | undefined;
+            if (!file || !file.buffer || !file.mimetype.startsWith("image/")) throw new Error("Invalid image");
+
+            const resized = await sharp(file.buffer).resize({ width: 500, withoutEnlargement: true }).jpeg({ quality: 80 }).toBuffer();
+            const name: string = randomUUID() + ".jpg";
+
+            await SL.storage.upsertBucket("images", true);
+            await SL.storage.uploadFile(resized, "images", name, "image/jpeg");
+
+            console.log("debug file");
+            reply.send({ status: "ok" });
+        });
+
+        fastify.get<{ Params: { filename: string } }>(
+            "/debug/file/:filename",
+            {
+                schema: {
+                    params: {
+                        filename: { type: "string", minLength: 1 },
+                    },
+                },
+            },
+            async (request, reply) => {
+                const filename = request.params.filename;
+                const data = await SL.storage.getFileStream("files", filename);
+
+                reply.headers(data.headers);
+                return reply.send(data.stream);
+            }
+        );
 
         return fastify;
     }
