@@ -7,16 +7,19 @@ import { VerificationCodeRepository } from "../domain/repositories/verification_
 import { CacheClient } from "../domain/cache.client";
 import { PubSubClient } from "../domain/pubsub.client";
 import { DLockClient } from "../domain/dlock.client";
+import { StorageClient } from "../domain/storage.client";
 
 export class SL {
     private static _pubSub: PubSubClient;
     private static _cache: CacheClient;
     private static _dlock: DLockClient;
+    private static _storage: StorageClient;
     private static _catalogRepository: CatalogRepository;
     private static _verificationCodeRepo: VerificationCodeRepository;
     private static _usersRepository: UsersRepository;
     private static _companiesRepository: CompaniesRepository;
     private static _ordersRepository: OrdersRepository;
+
 
 
     public static set RegisterPubSub(pubSub: PubSubClient) {
@@ -41,6 +44,14 @@ export class SL {
 
     public static get dlock(): DLockClient {
         return this._dlock;
+    }
+
+    public static set RegisterStorage(storage: StorageClient) {
+        this._storage = storage;
+    }
+
+    public static get storage(): StorageClient {
+        return this._storage;
     }
 
     public static set RegisterCatalogRepository(catalogRepository: CatalogRepository) {

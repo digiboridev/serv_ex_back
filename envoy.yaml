@@ -18,35 +18,59 @@ static_resources:
                   - upgrade_type: websocket
                 codec_type: AUTO
                 route_config:
-                  name: local_route
+                  name: main
                   virtual_hosts:
-                    - name: local_service
+                    - name: storage
+                      domains: ["storage.*"]
+                      routes:
+                        - match: { prefix: "/" }
+                          route: { cluster: storage }
+                    - name: storage_console
+                      domains: ["console.storage.*"]
+                      routes:
+                        - match: { prefix: "/" }
+                          route: { cluster: storage_console }
+                    - name: api
                       domains: ["*"]
                       routes:
                         - match: { prefix: "/" }
-                          route: { cluster: some_service }
+                          route: { cluster: main_api }
                 http_filters:
                   - name: envoy.filters.http.router
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
-    - name: some_service
+    - name: main_api
       connect_timeout: 0.25s
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
       load_assignment:
-        cluster_name: some_service
+        cluster_name: main_api
         endpoints:
           - lb_endpoints:
               - endpoint:
                   address:
                     socket_address:
-                      address: backend_1
+                      address: main_api_1
                       port_value: 1000
                 load_balancing_weight: 50
               - endpoint:
                   address:
                     socket_address:
-                      address: backend_2
+                      address: main_api_2
                       port_value: 1000
                 load_balancing_weight: 50
+    - name: storage
+      connect_timeout: 0.25s
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: storage
+        endpoints: [ lb_endpoints: [ endpoint: { address: { socket_address: { address: minio, port_value: 9000 }}}]]
+    - name: storage_console
+      connect_timeout: 0.25s
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: storage_console
+        endpoints: [ lb_endpoints: [ endpoint: { address: { socket_address: { address: minio, port_value: 9001 }}}]]
+
+

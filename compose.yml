@@ -1,37 +1,69 @@
-services:
+version: "3"
 
+services:
+  envoy:
+    image: envoyproxy/envoy:dev-3f198ba35873bba736374ea568fcfa6c4d903215
+    ports:
+      - "80:10000"
+      - "9901:9901"
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    environment:
+      - STORAGEDOMAIN=storage
+    restart: unless-stopped
+
+  main_api_1:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    expose: [1000]
+    environment:
+      - PORT=1000
+      - REDISLINK=redis://redis:6379
+      - S3LINK=http://s3:9000
+      - STORAGEADDR=minio
+      - STORAGEPORT=9000
+    depends_on: [redis]
+    restart: unless-stopped
+  
+  main_api_2:
+    build: 
+      context: .
+      dockerfile: dockerfile
+    expose: [1000]
+    environment:
+      - PORT=1000
+      - REDISLINK=redis://redis:6379
+      - S3LINK=http://s3:9000
+      - STORAGEADDR=minio
+      - STORAGEPORT=9000
+    depends_on: [redis]
+    restart: unless-stopped
+  
   redis:
     image: "redis:alpine"
     expose: [6379]
     restart: unless-stopped
-
-  backend_1:
-    build: 
-      context: .
-      dockerfile: dockerfile
-    expose: [1000]
+ 
+  minio:
+    image: minio/minio
+    command: server /data
+    # ports:
+    #   - "9000:9000"
+    #   - "9001:9001"
+    expose: [9000,9001]
     environment:
-      - PORT=1000
-      - REDISLINK=redis://redis:6379
-    depends_on: [redis]
-    restart: unless-stopped
-  
-  backend_2:
-    build: 
-      context: .
-      dockerfile: dockerfile
-    expose: [1000]
-    environment:
-      - PORT=1000
-      - REDISLINK=redis://redis:6379
-    depends_on: [redis]
-    restart: unless-stopped
-
-  envoy:
-    image: envoyproxy/envoy:dev-3f198ba35873bba736374ea568fcfa6c4d903215
-    ports:
-      - "3000:10000"
-      - "9901:9901"
+      MINIO_ROOT_USER: ${STORAGEACC}
+      MINIO_ROOT_PASSWORD: ${STORAGEPWD}
+      MINIO_CONSOLE_ADDRESS: ":9001"
+      # MINIO_BROWSER_REDIRECT_URL: http://console.${STORAGEDOMAIN}
+      MINIO_SERVER_URL: http://${STORAGEDOMAIN}
     volumes:
-      - ./envoy.yaml:/etc/envoy/envoy.yaml
+      - serve_minio:/data
+    extra_hosts:
+      # for local testing only, to avoid shadowing by container 'localhost' while console tries to lookup storage.localhost
+      - "storage.localhost:host-gateway" 
     restart: unless-stopped
+
+volumes:
+  serve_minio:

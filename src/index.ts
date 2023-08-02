@@ -10,6 +10,7 @@ import { OrdersRepositoryMongoImpl } from "./data/mongo/repositories/orders.repo
 import { PubSubClientRedisSmartImpl } from "./data/pubsub.client";
 import { CacheClientRedisImpl } from "./data/cache.client";
 import { DLockClientRedisImpl } from "./data/dlock.client";
+import { StorageClientMinioImpl } from "./data/storage.client";
 
 (async function init() {
     try {
@@ -22,7 +23,8 @@ import { DLockClientRedisImpl } from "./data/dlock.client";
         SL.RegisterUsersRepository = new UsersRepositoryMongoImpl();
         SL.RegisterCompaniesRepository = new CompaniesRepositoryMongoImpl();
         SL.RegisterOrdersRepository = new OrdersRepositoryMongoImpl();
-
+        SL.RegisterStorage = new StorageClientMinioImpl();
+        
         // Connect to MongoDB
         await connect(kMongoLink);
 
@@ -31,8 +33,11 @@ import { DLockClientRedisImpl } from "./data/dlock.client";
         const port = (process.env.PORT || 3000) as number;
         await fastify.listen({ port: port, host: "0.0.0.0" });
         console.log(`server listening on port ${port}`);
+
+        
     } catch (error) {
         console.error(error);
         process.exit(1);
     }
 })();
+
