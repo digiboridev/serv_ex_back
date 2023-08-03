@@ -18,10 +18,7 @@ import { randomUUID } from "crypto";
 export class FastifyFactory {
     static async createInstance(): Promise<FastifyInstance> {
         const fastify = Fastify();
-        await fastify.register(cors, {
-            origin: "*",
-            methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        });
+        await fastify.register(cors);
         await fastify.register(multer.contentParser);
         await fastify.register(FastifySSEPlugin);
         await fastify.register(fastifyWebsocket);
@@ -123,3 +120,5 @@ export class FastifyFactory {
         return fastify;
     }
 }
+
+//aasdas

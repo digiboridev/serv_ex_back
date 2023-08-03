@@ -4,19 +4,18 @@ services:
   envoy:
     image: envoyproxy/envoy:dev-3f198ba35873bba736374ea568fcfa6c4d903215
     ports:
-      - "80:10000"
+      - "80:80"
       - "9901:9901"
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
-    environment:
-      - STORAGEDOMAIN=storage
     restart: unless-stopped
 
   main_api_1:
-    build: 
+    build:
       context: .
       dockerfile: dockerfile
-    expose: [1000]
+    expose:
+      - 1000
     environment:
       - PORT=1000
       - REDISLINK=redis://redis:6379
@@ -24,12 +23,13 @@ services:
       - STORAGEPORT=9000
     depends_on: [redis]
     restart: unless-stopped
-  
+
   main_api_2:
-    build: 
+    build:
       context: .
       dockerfile: dockerfile
-    expose: [1000]
+    expose:
+      - 1000
     environment:
       - PORT=1000
       - REDISLINK=redis://redis:6379
@@ -37,19 +37,22 @@ services:
       - STORAGEPORT=9000
     depends_on: [redis]
     restart: unless-stopped
-  
+
   redis:
     image: "redis:alpine"
     command: redis-server --save "" --loglevel warning
-    expose: [6379]
+    expose:
+      - 6379
     volumes:
       - redis_data:/data
     restart: unless-stopped
- 
+
   minio:
     image: minio/minio
     command: server /data
-    expose: [9000,9001]
+    expose:
+      - 9000
+      - 9001
     environment:
       MINIO_ROOT_USER: ${STORAGEACC}
       MINIO_ROOT_PASSWORD: ${STORAGEPWD}
@@ -59,7 +62,7 @@ services:
       - storage_data:/data
     extra_hosts:
       # for local testing only, to avoid shadowing by container 'localhost' while console tries to lookup storage.localhost
-      - "storage.localhost:host-gateway" 
+      - "storage.localhost:host-gateway"
     restart: unless-stopped
 
 volumes:
