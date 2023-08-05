@@ -14,7 +14,8 @@ import multer from "fastify-multer";
 import { File } from "fastify-multer/lib/interfaces";
 import sharp from "sharp";
 import { randomUUID } from "crypto";
-import { Registry, collectDefaultMetrics } from "prom-client";
+import { collectDefaultMetrics,register,Histogram, Counter, Gauge } from "prom-client";
+
 
 export class FastifyFactory {
   static async createInstance(): Promise<FastifyInstance> {
@@ -44,19 +45,37 @@ export class FastifyFactory {
       }
     });
 
-    // Prometheus metrics
-    const registry = new Registry();
-    collectDefaultMetrics({ register: registry });
+
+    // Prometheus configuration
+    collectDefaultMetrics();
+    const restResponseTimeHistogram = new Histogram({
+      name: "rest_response_time_duration_seconds",
+      help: "REST API response time in seconds",
+      labelNames: ["method", "route", "status_code"],
+    });
+
+    fastify.addHook('onResponse', (request, reply, done) => {
+      const time = reply.getResponseTime();
+      const method = request.method;
+      const url = request.url;
+      const status = reply.statusCode;
+
+      console.log(`${method} ${url} ${status} ${time}ms`);
+      restResponseTimeHistogram.labels(method, url, status.toString()).observe(time);
+      done()
+    })
 
     fastify.get("/metrics", async (_, reply) => {
-      const metrics = await registry.metrics();
+      const metrics = await register.metrics();
       reply.send(metrics);
     });
 
+
     // Debug endpoints
-    fastify.get("/debug/healthcheck", (_, reply) => {
+    fastify.get("/debug/healthcheck",async (_, reply) => {
       console.log("healthcheck");
       reply.send({ status: "ok" });
+
     });
 
     fastify.get("/debug/sse", (_, res) => {
@@ -125,6 +144,8 @@ export class FastifyFactory {
         },
       },
       async (request, reply) => {
+        // const t = restResponseTimeHistogram.startTimer();
+
         const filename = request.params.filename;
         const data = await SL.storage.getFileStream("files", filename);
 

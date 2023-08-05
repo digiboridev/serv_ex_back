@@ -20,6 +20,11 @@ static_resources:
                 route_config:
                   name: main
                   virtual_hosts:
+                    - name: grafana
+                      domains: ["grafana.*"]
+                      routes:
+                        - match: { prefix: "/" }
+                          route: { cluster: grafana }
                     - name: storage
                       domains: ["storage.*"]
                       routes:
@@ -69,3 +74,8 @@ static_resources:
       load_assignment:
         cluster_name: storage_console
         endpoints: [lb_endpoints: [endpoint: { address: { socket_address: { address: minio, port_value: 9001 } } }]]
+    - name: grafana
+      type: STRICT_DNS
+      load_assignment:
+        cluster_name: grafana
+        endpoints: [lb_endpoints: [endpoint: { address: { socket_address: { address: grafana, port_value: 3000 } } }]]

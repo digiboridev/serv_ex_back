@@ -58,6 +58,7 @@ services:
       MINIO_ROOT_PASSWORD: ${STORAGEPWD}
       MINIO_CONSOLE_ADDRESS: ":9001"
       MINIO_SERVER_URL: http://${STORAGEDOMAIN}
+      MINIO_PROMETHEUS_AUTH_TYPE: public
     volumes:
       - storage_data:/data
     extra_hosts:
@@ -66,28 +67,29 @@ services:
     restart: unless-stopped
 
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    expose:
+      - 9090
     volumes:
       - prometheus_data:/prometheus
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - '9090:9090'
+    restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana
+    expose:
+      - 3000
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/config.ini:/etc/grafana/config.ini
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=illchangeitanyway
+      - GF_SECURITY_ADMIN_PASSWORD=adminpwd
+    restart: unless-stopped
     depends_on:
       - prometheus
-    ports:
-      - '4000:3000'
 
 volumes:
   storage_data:
