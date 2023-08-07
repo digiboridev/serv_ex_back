@@ -5,9 +5,12 @@ services:
     image: envoyproxy/envoy:dev-3f198ba35873bba736374ea568fcfa6c4d903215
     ports:
       - "80:80"
+      - "443:443"
       - "9901:9901"
     volumes:
-      - ./envoy.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/sert.crt:/etc/ssl/certs/sert.crt
+      - ./envoy/key.key:/etc/ssl/certs/key.key
     restart: unless-stopped
 
   main_api_1:
