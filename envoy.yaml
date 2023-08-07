@@ -5,7 +5,43 @@ admin:
 
 static_resources:
   listeners:
-    - name: listener_0
+    - name: https
+      address:
+        socket_address: { address: 0.0.0.0, port_value: 443 }
+      filter_chains:
+        - filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: ingress_http
+                upgrade_configs:
+                  - upgrade_type: websocket
+                codec_type: AUTO
+                route_config:
+                  name: main
+                  virtual_hosts:
+                    - name: forward_to_http
+                      domains: ["*"]
+                      routes:
+                        - match: { prefix: "/" }
+                          route: { cluster: http_upstream }
+                http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+          
+          transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain:
+                      filename: "/etc/ssl/certs/sert.crt"
+                    private_key:
+                      filename: "/etc/ssl/certs/key.key"
+                alpn_protocols: "h2,http/1.1"
+    - name: http
       address:
         socket_address: { address: 0.0.0.0, port_value: 80 }
       filter_chains:
@@ -45,6 +81,17 @@ static_resources:
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
+    - name: http_upstream
+      type: STATIC
+      load_assignment:
+        cluster_name: http_upstream
+        endpoints:
+          lb_endpoints:
+            endpoint:
+              address:
+                socket_address:
+                  address: 0.0.0.0
+                  port_value: 80
     - name: main_api
       type: STRICT_DNS
       lb_policy: ROUND_ROBIN
