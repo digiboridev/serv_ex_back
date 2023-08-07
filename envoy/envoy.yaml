@@ -85,32 +85,12 @@ static_resources:
       type: STATIC
       load_assignment:
         cluster_name: http_upstream
-        endpoints:
-          lb_endpoints:
-            endpoint:
-              address:
-                socket_address:
-                  address: 0.0.0.0
-                  port_value: 80
+        endpoints: [lb_endpoints: [endpoint: { address: { socket_address: { address: 0.0.0.0, port_value: 80 } } }]]
     - name: main_api
       type: STRICT_DNS
-      lb_policy: ROUND_ROBIN
       load_assignment:
         cluster_name: main_api
-        endpoints:
-          - lb_endpoints:
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: main_api_1
-                      port_value: 1000
-                load_balancing_weight: 40
-              - endpoint:
-                  address:
-                    socket_address:
-                      address: main_api_2
-                      port_value: 1000
-                load_balancing_weight: 60
+        endpoints: [lb_endpoints: [endpoint: { address: { socket_address: { address: main_api, port_value: 1000 } } }]]
     - name: storage
       type: STRICT_DNS
       load_assignment:

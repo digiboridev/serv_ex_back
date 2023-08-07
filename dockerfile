@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
    
-FROM node:20.4-alpine
+FROM node:20.4-buster
 WORKDIR /app
 
 # Install dependencies

@@ -6,14 +6,15 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "9901:9901"
+    expose:
+      - 9901
     volumes:
       - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml
       - ./envoy/sert.crt:/etc/ssl/certs/sert.crt
       - ./envoy/key.key:/etc/ssl/certs/key.key
     restart: unless-stopped
 
-  main_api_1:
+  main_api:
     build:
       context: .
       dockerfile: dockerfile
@@ -24,20 +25,15 @@ services:
       - REDISLINK=redis://redis:6379
       - STORAGEADDR=minio
       - STORAGEPORT=9000
-    depends_on: [redis]
-    restart: unless-stopped
-
-  main_api_2:
-    build:
-      context: .
-      dockerfile: dockerfile
-    expose:
-      - 1000
-    environment:
-      - PORT=1000
-      - REDISLINK=redis://redis:6379
-      - STORAGEADDR=minio
-      - STORAGEPORT=9000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:1000/debug/healthcheck"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    deploy:
+      mode: replicated
+      replicas: 2
     depends_on: [redis]
     restart: unless-stopped
 
