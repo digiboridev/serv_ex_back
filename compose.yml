@@ -90,8 +90,27 @@ services:
     depends_on:
       - prometheus
 
+
+  elastic:
+    image: 'bitnami/elasticsearch:latest'
+    ports: [9200:9200]
+    volumes:
+      - elastic_data:/bitnami/elasticsearch/data
+    restart: unless-stopped
+
+  kibana:
+    image: 'bitnami/kibana:latest'
+    ports: [5601:5601]
+    environment:
+      KIBANA_ELASTICSEARCH_URL : elastic
+    depends_on:
+      - elastic
+    restart: unless-stopped
+
+
 volumes:
   storage_data:
   redis_data:
   prometheus_data:
   grafana_data:
+  elastic_data:
