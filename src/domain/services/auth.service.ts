@@ -1,6 +1,8 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { AppError, errorMessage } from "../../core/errors";
 import { AuthData, Entity } from "../entities/auth_data";
+
+// TODO: remove dependency on mongo
 import { SessionModel } from "../../data/mongo/models/session";
 import { VerificationService } from "./verification.service";
 import axios from "axios";
@@ -31,6 +33,7 @@ export class AuthService {
         }
     }
 
+    // TODO: extract to session repo
     static async createSession(entity: Entity): Promise<Session> {
         return await SessionModel.create({ entityId: entity.id, scope: entity.scope });
     }

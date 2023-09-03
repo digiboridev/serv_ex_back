@@ -14,6 +14,19 @@ services:
       - ./envoy/key.key:/etc/ssl/certs/key.key
     restart: unless-stopped
 
+  mongo:
+    image: mongo
+    # ports:
+    #   - 27017:27017
+    expose:
+      - 27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
   main_api:
     build:
       context: .
@@ -22,6 +35,7 @@ services:
       - 1000
     environment:
       - PORT=1000
+      - MONGOLINK=mongodb://root:example@mongo:27017
       - REDISLINK=redis://redis:6379
       - STORAGEADDR=minio
       - STORAGEPORT=9000
@@ -91,24 +105,9 @@ services:
       - prometheus
 
 
-  elastic:
-    image: 'bitnami/elasticsearch:latest'
-    ports: [9200:9200]
-    volumes:
-      - elastic_data:/bitnami/elasticsearch/data
-    restart: unless-stopped
-
-  kibana:
-    image: 'bitnami/kibana:latest'
-    ports: [5601:5601]
-    environment:
-      KIBANA_ELASTICSEARCH_URL : elastic
-    depends_on:
-      - elastic
-    restart: unless-stopped
-
 
 volumes:
+  mongodb_data:
   storage_data:
   redis_data:
   prometheus_data:
