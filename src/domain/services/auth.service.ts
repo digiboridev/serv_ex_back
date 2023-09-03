@@ -1,13 +1,9 @@
 import { JwtPayload, sign, verify } from "jsonwebtoken";
 import { AppError, errorMessage } from "../../core/errors";
 import { AuthData, Entity } from "../entities/auth_data";
-
-// TODO: remove dependency on mongo
-import { SessionModel } from "../../data/mongo/models/session";
 import { VerificationService } from "./verification.service";
 import axios from "axios";
 import qs from "qs";
-import { Session } from "../entities/session";
 import { User } from "../entities/user";
 import { kGCId, kGCSecret } from "../../core/constants";
 import { SL } from "../../core/service_locator";
@@ -31,19 +27,6 @@ export class AuthService {
         } else {
             throw new Error("Invalid access token");
         }
-    }
-
-    // TODO: extract to session repo
-    static async createSession(entity: Entity): Promise<Session> {
-        return await SessionModel.create({ entityId: entity.id, scope: entity.scope });
-    }
-
-    static async getSessionById(id: string): Promise<Session | null> {
-        return await SessionModel.findById(id);
-    }
-
-    static async deleteSessionById(id: string) {
-        await SessionModel.findByIdAndDelete(id);
     }
 
     static async createAuthData(entity: Entity): Promise<AuthData> {
@@ -74,7 +57,7 @@ export class AuthService {
 
         if (!sessionId) throw new AppError("Invalid refresh token", 400);
 
-        const session = await AuthService.getSessionById(sessionId);
+        const session = await SL.sessionRepository.getSessionById(sessionId);
         if (!session) throw new AppError("Session expired", 403);
 
         const authData = await this.createAuthData({ id: session.entityId, scope: session.scope });
@@ -111,7 +94,7 @@ export class AuthService {
             return { registrationToken };
         } else {
             const authData = await this.createAuthData({ id: user.id, scope: "customer" });
-            const session = await AuthService.createSession({ id: user.id, scope: "customer" });
+            const session = await SL.sessionRepository.createSession({ id: user.id, scope: "customer" });
             const refreshToken = AuthService.signRefreshToken(session.id);
             const accessToken = AuthService.signAccessToken(authData);
             return { authData: authData, refreshToken: refreshToken, accessToken: accessToken };
@@ -154,7 +137,7 @@ export class AuthService {
             return { registrationToken };
         } else {
             const authData = await this.createAuthData({ id: user.id, scope: "customer" });
-            const session = await AuthService.createSession({ id: user.id, scope: "customer" });
+            const session = await SL.sessionRepository.createSession({ id: user.id, scope: "customer" });
             const refreshToken = AuthService.signRefreshToken(session.id);
             const accessToken = AuthService.signAccessToken(authData);
             return { authData: authData, refreshToken: refreshToken, accessToken: accessToken };
@@ -199,7 +182,7 @@ export class AuthService {
         });
 
         const authData = await this.createAuthData({ id: user.id, scope: "customer" });
-        const session = await AuthService.createSession({ id: user.id, scope: "customer" });
+        const session = await SL.sessionRepository.createSession({ id: user.id, scope: "customer" });
         const refreshToken = AuthService.signRefreshToken(session.id);
         const accessToken = AuthService.signAccessToken(authData);
         return { authData: authData, refreshToken: refreshToken, accessToken: accessToken };

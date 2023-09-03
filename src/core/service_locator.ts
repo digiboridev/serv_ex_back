@@ -1,4 +1,3 @@
-import { User } from "../domain/entities/user";
 import { CatalogRepository } from "../domain/repositories/catalog.repository";
 import { CompaniesRepository } from "../domain/repositories/companies.repository";
 import { OrdersRepository } from "../domain/repositories/orders.repository";
@@ -8,6 +7,7 @@ import { CacheClient } from "../domain/cache.client";
 import { PubSubClient } from "../domain/pubsub.client";
 import { DLockClient } from "../domain/dlock.client";
 import { StorageClient } from "../domain/storage.client";
+import { SessionsRepository } from "../domain/repositories/sessions.repository";
 
 export class SL {
     private static _pubSub: PubSubClient;
@@ -16,6 +16,7 @@ export class SL {
     private static _storage: StorageClient;
     private static _catalogRepository: CatalogRepository;
     private static _verificationCodeRepo: VerificationCodeRepository;
+    private static _sessionRepository: SessionsRepository;
     private static _usersRepository: UsersRepository;
     private static _companiesRepository: CompaniesRepository;
     private static _ordersRepository: OrdersRepository;
@@ -39,6 +40,9 @@ export class SL {
 
     public static set registerVerificationCodeRepository(verificationCodeRepo: VerificationCodeRepository) { this._verificationCodeRepo = verificationCodeRepo }
     public static get verificationCodeRepo(): VerificationCodeRepository { return this._verificationCodeRepo }
+
+    public static set registerSessionRepository(sessionRepository: SessionsRepository) { this._sessionRepository = sessionRepository }
+    public static get sessionRepository(): SessionsRepository { return this._sessionRepository }
 
     public static set registerUsersRepository(usersRepository: UsersRepository) { this._usersRepository = usersRepository }
     public static get usersRepository(): UsersRepository { return this._usersRepository }

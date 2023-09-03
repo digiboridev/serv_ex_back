@@ -11,6 +11,7 @@ import { PubSubClientRedisSmartImpl } from "./data/pubsub.client";
 import { CacheClientRedisImpl } from "./data/cache.client";
 import { DLockClientRedisImpl } from "./data/dlock.client";
 import { StorageClientMinioImpl } from "./data/storage.client";
+import { SessionsRepositoryMongoImpl } from "./data/mongo/repositories/sessions.repository";
 
 (async function init() {
     try {
@@ -20,6 +21,7 @@ import { StorageClientMinioImpl } from "./data/storage.client";
         SL.registerDLock = new DLockClientRedisImpl();
         SL.registerCatalogRepository = new CatalogRepositoryMongoImpl();
         SL.registerVerificationCodeRepository = new VerificationCodeRepositoryMongoImpl();
+        SL.registerSessionRepository = new SessionsRepositoryMongoImpl();
         SL.registerUsersRepository = new UsersRepositoryMongoImpl();
         SL.registerCompaniesRepository = new CompaniesRepositoryMongoImpl();
         SL.registerOrdersRepository = new OrdersRepositoryMongoImpl();
