@@ -19,4 +19,6 @@ const IssueSchema = new Schema(
     }
 );
 
+IssueSchema.index({ title: 1 }, { unique: true });
+
 export const IssueModel = model<Issue>("Issue", IssueSchema);

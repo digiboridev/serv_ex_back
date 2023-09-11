@@ -36,4 +36,8 @@ CategorySchema.virtual("issues", {
     justOne: false,
 });
 
+CategorySchema.index({ name: 1 }, { unique: true });
+CategorySchema.index({ parentId: 1 });
+CategorySchema.index({ name: 1, parentId: 1 }, { unique: true });
+
 export const CategoryModel = model("Category", CategorySchema);
